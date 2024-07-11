@@ -1,16 +1,19 @@
-import { AlertCircle, Archive, ArchiveX, File, Inbox, MessagesSquare, Search, Send, ShoppingCart, Trash2, Users2 } from "lucide-react"
+import { AlertCircle, Archive, Search, User } from "lucide-react"
 import { cn } from "../lib/utils"
 import { Nav } from "./nav"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./ui/resizable"
 import { Separator } from "./ui/separator"
 import { TooltipProvider } from "./ui/tooltip"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
+import { Tabs, TabsContent} from "./ui/tabs"
 import { Input } from "./ui/input"
 import { ResultList } from "./result-list"
 import { ResultDisplay } from "./result-display"
 import { useResult } from "../hooks/useResult"
 import { useState } from "react"
 import { Result} from "../data/data"
+import { Button } from "./ui/button"
+import { BarChartComponent } from "./barChart"
+import { AreaChartComponent } from "./areaChart"
 
 interface ResultProps {
   
@@ -60,90 +63,33 @@ export function ResultPage({
               "min-w-[50px] transition-all duration-300 ease-in-out"
           )}
         >
-          <div
-            className={cn(
-              "flex h-[52px] items-center justify-center",
-              isCollapsed ? "h-[52px]" : "px-2"
-            )}
-          >
-            <p>Mohamed Sadek Rachidi</p>
-          </div>
-          <Separator />
-          <Nav
+            <Nav
             isCollapsed={isCollapsed}
             links={[
               {
-                title: "Inbox",
-                label: "128",
-                icon: Inbox,
+                title: "Recherce",
+                label: "",
+                icon: Search,
                 variant: "default",
               },
               {
-                title: "Drafts",
+                title: "Alerts",
                 label: "9",
-                icon: File,
-                variant: "ghost",
-              },
-              {
-                title: "Sent",
-                label: "",
-                icon: Send,
-                variant: "ghost",
-              },
-              {
-                title: "Junk",
-                label: "23",
-                icon: ArchiveX,
-                variant: "ghost",
-              },
-              {
-                title: "Trash",
-                label: "",
-                icon: Trash2,
-                variant: "ghost",
-              },
-              {
-                title: "Archive",
-                label: "",
-                icon: Archive,
-                variant: "ghost",
-              },
-            ]}
-          />
-          <Separator />
-          <Nav
-            isCollapsed={isCollapsed}
-            links={[
-              {
-                title: "Social",
-                label: "972",
-                icon: Users2,
-                variant: "ghost",
-              },
-              {
-                title: "Updates",
-                label: "342",
                 icon: AlertCircle,
                 variant: "ghost",
               },
               {
-                title: "Forums",
-                label: "128",
-                icon: MessagesSquare,
-                variant: "ghost",
-              },
-              {
-                title: "Shopping",
-                label: "8",
-                icon: ShoppingCart,
-                variant: "ghost",
-              },
-              {
-                title: "Promotions",
-                label: "21",
+                title: "Historique",
+                label: "",
                 icon: Archive,
                 variant: "ghost",
               },
+              {
+                title: "Profile",
+                label: "23",
+                icon: User,
+                variant: "ghost",
+              }
             ]}
           />
         </ResizablePanel>
@@ -151,28 +97,20 @@ export function ResultPage({
         <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
           <Tabs defaultValue="all">
             <div className="flex items-center px-4 py-2">
-              <h1 className="text-xl font-bold">Inbox</h1>
-              <TabsList className="ml-auto">
-                <TabsTrigger
-                  value="all"
-                  className="text-zinc-600 dark:text-zinc-200"
-                >
-                  All mail
-                </TabsTrigger>
-                <TabsTrigger
-                  value="unread"
-                  className="text-zinc-600 dark:text-zinc-200"
-                >
-                  Unread
-                </TabsTrigger>
-              </TabsList>
+              <h1 className="text-xl font-bold">Recherche</h1>
             </div>
             <Separator />
             <div className="bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <form>
                 <div className="relative">
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search" className="pl-8" />
+                  <Input placeholder="Tags" className="pl-8" />
+                </div>
+                <div className="relative mt-3">
+                  <Input placeholder="Sources" className="pl-8" />
+                </div>
+                <div className="relative">
+                  <Button className="ml-[-630px] mt-3">Rechercher</Button>
                 </div>
               </form>
             </div>
@@ -188,6 +126,15 @@ export function ResultPage({
           />
         </ResizablePanel>
       </ResizablePanelGroup>
+      <Separator />
+      <div className="ml-[300px] grid grid-cols-2 gap-x-3">
+        <div className="mt-3">
+          <BarChartComponent />
+        </div>
+        <div className="mt-3">
+          <AreaChartComponent />
+        </div>
+      </div>
     </TooltipProvider>
   )
 }
