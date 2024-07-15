@@ -16,6 +16,10 @@ function getCookie(cname: string) {
   }
   return "";
 }
+
+/*
+ * the main component
+ * */
 function App() {
   const layout = getCookie("react-resizable-panels:layout")
   const collapsed = getCookie("react-resizable-panels:collapsed")
