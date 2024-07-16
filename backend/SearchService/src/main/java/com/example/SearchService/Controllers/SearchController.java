@@ -1,6 +1,7 @@
 package com.example.SearchService.Controllers;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -24,6 +25,93 @@ public class SearchController {
 
     @GetMapping(path = "/search")
     public String search() {
+        WebDriver driver = new ChromeDriver();
+
+        driver.get("https://facebook.com/");
+
+        driver.findElement(By.id("email")).sendKeys("rachidisadek@gmail.com");
+        driver.findElement(By.id("pass")).sendKeys("Papa62@2");
+        driver.findElement(By.name("login")).click();
+        try {
+            // Sleep for 5 seconds (5000 milliseconds)
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            // Handle the exception
+            e.printStackTrace();
+        }
+
+        driver.findElement(By.xpath("//input[@placeholder='Search Facebook']")).sendKeys("euro2024" + Keys.ENTER);
+        try {
+            // Sleep for 5 seconds (5000 milliseconds)
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            // Handle the exception
+            e.printStackTrace();
+        }
+        WebElement div = driver.findElement(By.xpath("//div[@role='feed']"));
+        List<WebElement> divElements = div.findElements(By.xpath("./div"));
+
+        //span
+        String userNameClass = "html-span xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x1hl2dhg x16tdsg8 x1vvkbs";
+        // div
+        String captionClass = "xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs x126k92a";
+        // img
+        String imgClass1 = "x1ey2m1c xds687c x5yr21d x10l6tqk x17qophe x13vifvy xh8yej3 xl1xv1r";
+        // img
+        String imgClass2 = "xz74otr x1ey2m1c xds687c x5yr21d x10l6tqk x17qophe x13vifvy xh8yej3";
+        // span
+        String LikesClass = "xt0b8zv x2bj2ny xrbpyxo xl423tq";
+
+        for (WebElement divElement : divElements) {
+            try {
+                WebElement userNameElement = divElement.findElement(By.cssSelector("span." + userNameClass.replace(" ", ".")));
+                String userName = userNameElement.getText();
+                System.out.println("User Name: " + userName);
+            } catch (Exception e) {
+                //e.printStackTrace();
+                System.out.println("couldn't find username");
+            }
+            try {
+                WebElement captionElement = divElement.findElement(By.cssSelector("div." + captionClass.replace(" ", ".")));
+                String caption = captionElement.getText();
+                System.out.println("caption: " + caption);
+            } catch (Exception e) {
+                //e.printStackTrace();
+                System.out.println("couldn't find caption");
+            }
+            try {
+                WebElement imgOneElement = divElement.findElement(By.cssSelector("img." + imgClass1.replace(" ", ".")));
+                String img = imgOneElement.getAttribute("src");
+                System.out.println("image: " + img);
+            } catch (Exception e) {
+                //e.printStackTrace();
+                System.out.println("couldn't find image One");
+            }
+            try {
+                WebElement imgOneElement = divElement.findElement(By.cssSelector("img." + imgClass2.replace(" ", ".")));
+                String img = imgOneElement.getAttribute("src");
+                System.out.println("image: " + img);
+            } catch (Exception e) {
+                //e.printStackTrace();
+                System.out.println("couldn't find image two");
+            }
+            try {
+                WebElement likesElement = divElement.findElement(By.cssSelector("span." + LikesClass.replace(" ", ".")));
+                String likes = likesElement.getText();
+                System.out.println("likes: " + likes);
+            } catch (Exception e) {
+                //e.printStackTrace();
+                System.out.println("couldn't find number of likes");
+            }
+
+        }
+
+        /*
+        for (WebElement div : divElements) {
+            System.out.println(div.getAttribute("innerHTML"));
+        }
+        driver.quit();
+        /*
         WebDriver driver = new ChromeDriver();
 
         driver.get("https://instagram.com/tags/euro2024");
@@ -116,9 +204,9 @@ public class SearchController {
             System.out.println(element.getText());
         }
         driver.quit();
+        */
         return "<html>" +
                 "<body>" +
-                "<h1>Page title is: " + pageTitle + "</h1>" +
                 "</body>" +
                 "</html>";
     }
