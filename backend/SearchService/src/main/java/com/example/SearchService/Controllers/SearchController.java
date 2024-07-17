@@ -3,6 +3,7 @@ package com.example.SearchService.Controllers;
 import com.example.SearchService.Domain.Result;
 import com.example.SearchService.ScrapingService.FacebookScraper;
 import com.example.SearchService.ScrapingService.InstgrameScraper;
+import com.example.SearchService.ScrapingService.NewsScraper;
 import com.example.SearchService.ScrapingService.ScrapingService;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -35,7 +36,8 @@ public class SearchController {
 
         ScrapingService facebookScraper = new FacebookScraper();
         ScrapingService instagramScraper = new InstgrameScraper();
-        ArrayList<Result> results = instagramScraper.Scrape(keywords);
+        ScrapingService newsScraper = new NewsScraper();
+        ArrayList<Result> results = newsScraper.Scrape(keywords);
 
 
 
