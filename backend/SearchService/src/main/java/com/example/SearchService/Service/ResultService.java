@@ -17,8 +17,6 @@ public class ResultService {
     }
 
     public void CreateResult(ArrayList<Result> results){
-        for(Result result:results){
-            resultRepository.save(result);
-        }
+        resultRepository.saveAll(results);
     }
 }

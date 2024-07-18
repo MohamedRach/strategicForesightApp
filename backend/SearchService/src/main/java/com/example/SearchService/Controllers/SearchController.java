@@ -5,6 +5,7 @@ import com.example.SearchService.ScrapingService.FacebookScraper;
 import com.example.SearchService.ScrapingService.InstgrameScraper;
 import com.example.SearchService.ScrapingService.NewsScraper;
 import com.example.SearchService.ScrapingService.ScrapingService;
+import com.example.SearchService.Service.ResultService;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -25,8 +26,11 @@ import java.util.stream.Collectors;
 @Controller
 public class SearchController {
 
-
-
+    private final ResultService resultService;
+    @Autowired
+    public SearchController(ResultService resultService) {
+        this.resultService = resultService;
+    }
 
     @GetMapping(path = "/search")
     public String search() {
@@ -37,11 +41,8 @@ public class SearchController {
         ScrapingService facebookScraper = new FacebookScraper();
         ScrapingService instagramScraper = new InstgrameScraper();
         ScrapingService newsScraper = new NewsScraper();
-        ArrayList<Result> results = newsScraper.Scrape(keywords);
-
-
-
-
+        ArrayList<Result> results = facebookScraper.Scrape(keywords);
+        resultService.CreateResult(results);
         return "<html>" +
                 "<body>" +
                 "</body>" +
