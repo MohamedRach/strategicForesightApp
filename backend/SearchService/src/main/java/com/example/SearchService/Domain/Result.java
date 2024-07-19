@@ -10,6 +10,8 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.util.List;
+
 
 @Data
 @Document(indexName = "result")
@@ -22,6 +24,8 @@ public class Result {
 
     @Field(type = FieldType.Text, analyzer = "standard")
     private String source;
+    @Field(type = FieldType.Text, analyzer = "standard")
+    private String keyword;
     @Field(type = FieldType.Text, analyzer = "standard")
     private String caption;
     @Field(type = FieldType.Text, analyzer = "standard")

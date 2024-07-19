@@ -6,6 +6,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +17,23 @@ public class NewsScraper implements ScrapingService{
     public static final String articleClass = "IFHyqb DeXSAc";
     public static final String sourceClass = "vr1PYe";
     public static final String imgClass = "Quavad vwBmvb";
+
+    private ChromeOptions options;
+
+    public NewsScraper() {
+        options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+    }
     @Override
-    public ArrayList<Result> Scrape(ArrayList<String> keywords) {
+    public ArrayList<Result> Scrape(List<String> keywords) {
         ArrayList<Result> results = new ArrayList<>();
         for (String keyword : keywords) {
-            WebDriver driver = new ChromeDriver();
+            WebDriver driver = new ChromeDriver(options);
 
             driver.get("https://news.google.com");
 
@@ -36,6 +49,7 @@ public class NewsScraper implements ScrapingService{
 
             for (WebElement article : articles) {
                 Result result = new Result();
+                result.setKeyword(keyword);
                 try {
                     WebElement link = article.findElement(By.cssSelector("a." + linkClass.replace(" ", ".")));
                     result.setCaption(link.getText());

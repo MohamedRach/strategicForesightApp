@@ -3,6 +3,7 @@ package com.example.SearchService.ScrapingService;
 import com.example.SearchService.Domain.Result;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,38 +11,49 @@ import java.util.List;
 public class FacebookScraper implements ScrapingService{
 
     //span
-    public static final String userNameClass = "html-span xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x1hl2dhg x16tdsg8 x1vvkbs";
+    private static final String userNameClass = "html-span xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x1hl2dhg x16tdsg8 x1vvkbs";
     // div
-    public static final String captionClass = "xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs x126k92a";
+    private static final String captionClass = "xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs x126k92a";
     // img
-    public static final String imgClass1 = "x1ey2m1c xds687c x5yr21d x10l6tqk x17qophe x13vifvy xh8yej3 xl1xv1r";
+    private static final String imgClass1 = "x1ey2m1c xds687c x5yr21d x10l6tqk x17qophe x13vifvy xh8yej3 xl1xv1r";
     // img
-    public static final String imgClass2 = "xz74otr x1ey2m1c xds687c x5yr21d x10l6tqk x17qophe x13vifvy xh8yej3";
+    private static final String imgClass2 = "xz74otr x1ey2m1c xds687c x5yr21d x10l6tqk x17qophe x13vifvy xh8yej3";
     // span
-    public static final String LikesClass = "xt0b8zv x2bj2ny xrbpyxo xl423tq";
+    private static final String LikesClass = "xt0b8zv x2bj2ny xrbpyxo xl423tq";
     //public static final String LikesClass = "x1e558r4";
-    public static final String reelClass = "x1i10hfl x1qjc9v5 xjbqb8w xjqpnuy xa49m3k xqeqjp1 x2hbi6w x13fuv20 xu3j5b3 x1q0q8m5 x26u7qi x972fbf xcfux6l x1qhh985 xm0m39n x9f619 x1ypdohk xdl72j9 x2lah0s xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r x2lwn1j xeuugli xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1ja2u2z x1t137rt x1o1ewxj x3x9cwd x1e5q0jg x13rtm0m x1q0g3np x87ps6o x1lku1pv x1rg5ohu x1a2a7pz x1n2onr6 xh8yej3";
+    private static final String reelClass = "x1i10hfl x1qjc9v5 xjbqb8w xjqpnuy xa49m3k xqeqjp1 x2hbi6w x13fuv20 xu3j5b3 x1q0q8m5 x26u7qi x972fbf xcfux6l x1qhh985 xm0m39n x9f619 x1ypdohk xdl72j9 x2lah0s xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r x2lwn1j xeuugli xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1ja2u2z x1t137rt x1o1ewxj x3x9cwd x1e5q0jg x13rtm0m x1q0g3np x87ps6o x1lku1pv x1rg5ohu x1a2a7pz x1n2onr6 xh8yej3";
+    // chrome options
+    private ChromeOptions options;
+
+    public FacebookScraper() {
+        options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+    }
 
 
     @Override
-    public ArrayList<Result> Scrape(ArrayList<String> keywords) {
+    public ArrayList<Result> Scrape(List<String> keywords) {
         ArrayList<Result> results = new ArrayList<>();
+        WebDriver driver = new ChromeDriver(options);
+
+        driver.get("https://facebook.com/");
+
+        driver.findElement(By.id("email")).sendKeys("rachidisadek@gmail.com");
+        driver.findElement(By.id("pass")).sendKeys("Papa62@2");
+        driver.findElement(By.name("login")).click();
+        try {
+            // Sleep for 5 seconds (5000 milliseconds)
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            // Handle the exception
+            e.printStackTrace();
+        }
         for (String keyword : keywords) {
-            WebDriver driver = new ChromeDriver();
-
-            driver.get("https://facebook.com/");
-
-            driver.findElement(By.id("email")).sendKeys("rachidisadek@gmail.com");
-            driver.findElement(By.id("pass")).sendKeys("Papa62@2");
-            driver.findElement(By.name("login")).click();
-            try {
-                // Sleep for 5 seconds (5000 milliseconds)
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                // Handle the exception
-                e.printStackTrace();
-            }
-
             driver.findElement(By.xpath("//input[@placeholder='Search Facebook']")).sendKeys(keyword + Keys.ENTER);
             try {
                 // Sleep for 5 seconds (5000 milliseconds)
@@ -71,7 +83,7 @@ public class FacebookScraper implements ScrapingService{
                 i++;
             }
             for (WebElement divElement : divElements) {
-                Result result = getResult(divElement);
+                Result result = getResult(divElement, keyword);
                 results.add(result);
 
             }
@@ -81,9 +93,10 @@ public class FacebookScraper implements ScrapingService{
         return results;
     }
 
-    private Result getResult(WebElement divElement) {
+    private Result getResult(WebElement divElement, String keyword) {
         Result result = new Result();
         result.setSource("facebook");
+        result.setKeyword(keyword);
         try {
             WebElement userNameElement = divElement.findElement(By.cssSelector("span." + userNameClass.replace(" ", ".")));
             String userName = userNameElement.getText();

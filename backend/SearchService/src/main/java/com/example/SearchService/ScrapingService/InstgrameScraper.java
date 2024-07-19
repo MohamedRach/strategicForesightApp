@@ -5,6 +5,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -21,12 +22,23 @@ public class InstgrameScraper implements ScrapingService{
     public static final String pictureClass = "x5yr21d xu96u03 x10l6tqk x13vifvy x87ps6o xh8yej3";
     public static final String LikesClass = "html-span xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x1hl2dhg x16tdsg8 x1vvkbs";
 
-    @Override
-    public ArrayList<Result> Scrape(ArrayList<String> keywords) {
-        ArrayList<Result> results = new ArrayList<>();
-        for (String keyword : keywords) {
-            WebDriver driver = new ChromeDriver();
+    private ChromeOptions options;
 
+    public InstgrameScraper() {
+        options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+    }
+
+    @Override
+    public ArrayList<Result> Scrape(List<String> keywords) {
+        ArrayList<Result> results = new ArrayList<>();
+        WebDriver driver = new ChromeDriver(options);
+        for (String keyword : keywords) {
             driver.get("https://instagram.com/tags/"+ keyword);
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(6000));
             wait.until((ExpectedCondition<Boolean>) d -> {
@@ -41,17 +53,13 @@ public class InstgrameScraper implements ScrapingService{
             List<String> hrefs = elements.stream()
                     .map(element -> element.getAttribute("href"))
                     .collect(Collectors.toList());
-            List<WebElement> usernameElements = new ArrayList<>();
-            List<WebElement> captionElements = new ArrayList<>();
-            List<WebElement> pictureElements = new ArrayList<>();
-            List<WebElement> likesElements = new ArrayList<>();
-            int i = 0;
+
             for (String href : hrefs) {
                 if (href != null && !href.contains("/p/")) {
                     System.out.println("Link without '/p/': " + href);
                     continue;
                 }
-                Result result = getResult(href);
+                Result result = getResult(href, keyword);
                 results.add(result);
 
             }
@@ -62,10 +70,11 @@ public class InstgrameScraper implements ScrapingService{
         return results;
     }
 
-    private Result getResult(String post) {
+    private Result getResult(String post, String keyword) {
         Result result = new Result();
         result.setSource("instagram");
-        WebDriver innerDriver = new ChromeDriver();
+        result.setKeyword(keyword);
+        WebDriver innerDriver = new ChromeDriver(options);
         WebDriverWait innerWait = new WebDriverWait(innerDriver, Duration.ofSeconds(30));
         innerDriver.get(post);
         innerWait.until((ExpectedCondition<Boolean>) d -> {

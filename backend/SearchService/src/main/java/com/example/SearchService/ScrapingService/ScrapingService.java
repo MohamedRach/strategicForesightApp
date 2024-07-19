@@ -4,7 +4,8 @@ import com.example.SearchService.Domain.Result;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 public interface ScrapingService {
-    ArrayList<Result> Scrape(ArrayList<String> keywords);
+    ArrayList<Result> Scrape(List<String> keywords);
 }
