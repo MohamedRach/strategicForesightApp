@@ -10,6 +10,10 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfigurat
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 import javax.net.ssl.SSLContext;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 
 @Configuration
 @EnableElasticsearchRepositories(basePackages = "com.example.SearchService.Repository")
@@ -21,14 +25,18 @@ public class ElasticSearchConfig extends ElasticsearchConfiguration {
                 .connectedToLocalhost()
                 .usingSsl(buildSSLContext())
                 .withBasicAuth("elastic", "12345")
+                .withSocketTimeout(Duration.ofSeconds(30))
+                .withConnectTimeout(Duration.ofSeconds(30))// Disable hostname verification
                 .build();
     }
 
     private static SSLContext buildSSLContext() {
         try {
-            return new SSLContextBuilder().loadTrustMaterial(null, TrustAllStrategy.INSTANCE).build();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            return SSLContextBuilder.create()
+                    .loadTrustMaterial(null, (x509Certificates, s) -> true)
+                    .build();
+        } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+            throw new RuntimeException("Failed to create SSLContext", e);
         }
     }
 }

@@ -5,6 +5,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,8 +96,10 @@ public class FacebookScraper implements ScrapingService{
 
     private Result getResult(WebElement divElement, String keyword) {
         Result result = new Result();
+        LocalDate today = LocalDate.now();
         result.setSource("facebook");
         result.setKeyword(keyword);
+        result.setDate(today);
         try {
             WebElement userNameElement = divElement.findElement(By.cssSelector("span." + userNameClass.replace(" ", ".")));
             String userName = userNameElement.getText();

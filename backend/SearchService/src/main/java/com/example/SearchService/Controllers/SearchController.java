@@ -1,5 +1,6 @@
 package com.example.SearchService.Controllers;
 
+import com.example.SearchService.Domain.ImageUrl;
 import com.example.SearchService.Domain.Query;
 import com.example.SearchService.Domain.Result;
 import com.example.SearchService.ScrapingService.FacebookScraper;
@@ -16,15 +17,20 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -40,6 +46,10 @@ public class SearchController {
     private final ScrapingService facebookScraper;
     private final ScrapingService instagramScraper;
     private final ScrapingService newsScraper;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
     @Autowired
     public SearchController(ResultService resultService) {
         this.resultService = resultService;
@@ -47,10 +57,10 @@ public class SearchController {
         this.instagramScraper = new InstgrameScraper();
         this.newsScraper = new NewsScraper();
     }
-
+    @CrossOrigin
     @PostMapping(path = "/search")
     public ArrayList<Result> search(@RequestBody Query query) {
-
+        System.out.println(query);
         List<String> keywords = query.getKeywords();
         List<String> sources = query.getSources();
         ArrayList<Result> results = new ArrayList<>();
@@ -76,25 +86,35 @@ public class SearchController {
         this.stopEventStreaming();
         return results;
     }
+    @CrossOrigin
+    @PostMapping("/download-image")
+    public ResponseEntity<String> downloadImage(@RequestBody ImageUrl imageUrl) {
+        try {
+            
+            URI uri = new URI(imageUrl.getUrl());
+
+            // Fetch the image data
+            byte[] imageData = restTemplate.getForObject(uri, byte[].class);
+
+            // Encode the image data to Base64
+            String base64Image = Base64.getEncoder().encodeToString(imageData);
+
+            // Create a data URL
+            String dataUrl = "data:image/jpeg;base64," + base64Image;
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body(dataUrl);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error downloading image: " + e.getMessage());
+        }
+    }
 
     @PostMapping(path = "/test")
     public Query test(@RequestBody Query query) {
-        for (String keyword : query.getKeywords()) {
-            System.out.println(keyword);
-        }
-        for (String source : query.getSources()) {
-            System.out.println(source);
-        }
-        try {
-            // Simulate a long-lasting task
 
-            Thread.sleep(20000); // Simulate work by sleeping for 5 seconds
-
-            System.out.println("Done");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        this.stopEventStreaming();
         return query;
     }
 

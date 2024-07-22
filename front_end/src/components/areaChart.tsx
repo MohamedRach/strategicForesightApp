@@ -31,6 +31,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function AreaChartComponent() {
+  const isLoading = true
   return (
     <Card>
       <CardHeader>
@@ -40,7 +41,9 @@ export function AreaChartComponent() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[300px] w-[700px]">
+        {isLoading ? (
+          <div>No data to show</div>
+        ):  <ChartContainer config={chartConfig} className="h-[300px] w-[700px]">
           <AreaChart
             accessibilityLayer
             data={chartData}
@@ -70,7 +73,9 @@ export function AreaChartComponent() {
             />
           </AreaChart>
         </ChartContainer>
-      </CardContent>
+ 
+        }
+        </CardContent>
     </Card>
   )
 }

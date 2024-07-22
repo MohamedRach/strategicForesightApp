@@ -1,5 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
-import { Result } from "../data/data";
+import { Result } from "../api/search.api";
 import { useResult } from "../hooks/useResult";
 import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "../lib/utils";
@@ -47,20 +47,20 @@ export function ResultList({ items }: ResultListProps) {
                   })}
                 </div>
               </div>
-              <div className="text-xs font-medium">{item.platform}</div>
+              <div className="text-xs font-medium">{item.source}</div>
             </div>
             <div className="line-clamp-2 text-xs text-muted-foreground">
-              {item.content.substring(0, 300)}
+              {item.caption.substring(0, 300)}
             </div>
-            {item.tags.length ? (
+            
               <div className="flex items-center gap-2">
-                {item.tags.map((label) => (
-                  <Badge key={label} variant="default">
-                    {label}
+                
+                  <Badge key={item.keyword} variant="default">
+                    {item.keyword}
                   </Badge>
-                ))}
+                
               </div>
-            ) : null}
+            
           </button>
         ))}
       </div>

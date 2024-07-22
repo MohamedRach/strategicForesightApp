@@ -1,6 +1,8 @@
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "./ui/chart"
+import { Result } from "../api/search.api"
+import { Spinner } from "./Spinner"
 
 const chartData = [
   { month: "January", desktop: 186},
@@ -16,39 +18,75 @@ const chartData = [
 ]
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  nbrofposts: {
+    label: "Number of posts",
     color: "hsl(var(--chart-1))",
   },
   
 } satisfies ChartConfig
+interface BarCharProps{
+  items: Result[] | undefined
+  isIdle: boolean
+}
+interface OutputObject {
+  user: string;
+  nbrofposts: number;
+}
+function countSourceAppearances(inputArray: Result[] | undefined): OutputObject[] {
+  const sourceCountMap: { [key: string]: number } = {};
 
-export function BarChartComponent() {
+  if(inputArray) {
+    inputArray.forEach(item => {
+      if (sourceCountMap[item.username]) {
+        sourceCountMap[item.username]++;
+      } else {
+        sourceCountMap[item.username] = 1;
+      }
+    });
+  }
+  const outputArray: OutputObject[] = Object.keys(sourceCountMap).map(source => ({
+    user: source,
+    nbrofposts: sourceCountMap[source],
+  }));
+
+  return outputArray;
+}
+export function BarChartComponent({items, isIdle}: BarCharProps) {
+  
+  const data: OutputObject[] = countSourceAppearances(items)
+  console.log(data)
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bar Chart - Multiple</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Bar Chart</CardTitle>
+        <CardDescription>number of posts published by each user</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[300px] w-[700px]">
+        {isIdle ? (
+          <div>No data to show</div>
+        ): data && data.length > 0 ? (<ChartContainer config={chartConfig} className="h-[300px] w-[1500px]">
 
-          <BarChart accessibilityLayer data={chartData}>
+          <BarChart accessibilityLayer data={data}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey="user"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) => value}
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+            <Bar dataKey="nbrofposts" fill="var(--color-desktop)" radius={4} />
           </BarChart>
-        </ChartContainer>
+        </ChartContainer>):(
+          <div className="flex justify-center items-center h-64 text-gray-500">
+                  <Spinner>This my take some time please wait!!</Spinner>
+          </div> 
+        )
+        } 
       </CardContent>
     </Card>
   )

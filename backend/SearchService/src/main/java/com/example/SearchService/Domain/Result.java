@@ -10,6 +10,8 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 
@@ -34,4 +36,6 @@ public class Result {
     private String likes;
     @Field(type = FieldType.Text, analyzer = "standard")
     private String username;
+    @Field(type = FieldType.Date, analyzer = "standard")
+    private LocalDate date;
 }

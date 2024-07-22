@@ -112,7 +112,7 @@ export const results = [
 ]
 
 
-export type Result = (typeof results)[number]
+//export type Result = (typeof results)[number]
 
 export const accounts = [
   {

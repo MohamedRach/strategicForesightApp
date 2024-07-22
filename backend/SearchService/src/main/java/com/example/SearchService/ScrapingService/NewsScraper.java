@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +50,9 @@ public class NewsScraper implements ScrapingService{
 
             for (WebElement article : articles) {
                 Result result = new Result();
+                LocalDate today = LocalDate.now();
                 result.setKeyword(keyword);
+                result.setDate(today);
                 try {
                     WebElement link = article.findElement(By.cssSelector("a." + linkClass.replace(" ", ".")));
                     result.setCaption(link.getText());

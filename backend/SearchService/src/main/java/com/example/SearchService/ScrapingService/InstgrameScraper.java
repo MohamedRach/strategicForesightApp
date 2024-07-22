@@ -10,6 +10,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,8 +73,10 @@ public class InstgrameScraper implements ScrapingService{
 
     private Result getResult(String post, String keyword) {
         Result result = new Result();
+        LocalDate today = LocalDate.now();
         result.setSource("instagram");
         result.setKeyword(keyword);
+        result.setDate(today);
         WebDriver innerDriver = new ChromeDriver(options);
         WebDriverWait innerWait = new WebDriverWait(innerDriver, Duration.ofSeconds(30));
         innerDriver.get(post);
