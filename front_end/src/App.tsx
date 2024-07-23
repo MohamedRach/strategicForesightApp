@@ -31,7 +31,6 @@ function App() {
     <>
       <div className="hidden flex-col md:flex">
         <ResultPage
-          results={results}
           defaultLayout={defaultLayout}
           defaultCollapsed={defaultCollapsed}
           navCollapsedSize={4}

@@ -63,7 +63,9 @@ export function BarChartComponent({items, isIdle}: BarCharProps) {
       </CardHeader>
       <CardContent>
         {isIdle ? (
-          <div>No data to show</div>
+           <div className="flex justify-center items-center h-64 text-gray-500">
+                  <Spinner>This my take some time please wait!!</Spinner>
+          </div> 
         ): data && data.length > 0 ? (<ChartContainer config={chartConfig} className="h-[300px] w-[1500px]">
 
           <BarChart accessibilityLayer data={data}>
@@ -83,7 +85,7 @@ export function BarChartComponent({items, isIdle}: BarCharProps) {
           </BarChart>
         </ChartContainer>):(
           <div className="flex justify-center items-center h-64 text-gray-500">
-                  <Spinner>This my take some time please wait!!</Spinner>
+                No data to show
           </div> 
         )
         } 

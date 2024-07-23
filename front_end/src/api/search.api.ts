@@ -1,4 +1,4 @@
-import { useMutation} from "@tanstack/react-query"
+import { QueryKey, useMutation, useQuery} from "@tanstack/react-query"
 
 
 export type Result = {
@@ -16,6 +16,14 @@ export type Query = {
   keywords: string[]
   sources: string[]
 }
+
+export type Search = {
+  id: string
+  keywords: string[]
+  sources: string[]
+  createdAt: string,
+  updatedAt: string
+}
 const searchAPI = async (searchData: Query) : Promise<Result[]> => {
   console.log(searchData)
   const response = await fetch('http://localhost:8080/search', {
@@ -28,6 +36,33 @@ const searchAPI = async (searchData: Query) : Promise<Result[]> => {
 
   
   return response.json();
+};
+
+const fetchAllSearches = async () => {
+  const response = await fetch('http://localhost:8080/search');
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+};
+
+const fetchResultsById = async (id: string): Promise<Result[]> => {
+  const response = await fetch(`http://localhost:8080/search/${id}`);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+};
+
+export const useGetResultsById = (id: string) => {
+  return useQuery<Result[], Error>({
+    queryKey: ['results', id],
+    queryFn: () => fetchResultsById(id),
+  });
+};
+
+export const useGetAllSearches = () => {
+  return useQuery({queryKey:['searches'], queryFn:fetchAllSearches});
 };
 
 type Body = {

@@ -116,10 +116,14 @@ public class SearchController {
     }
     @CrossOrigin
     @GetMapping(path = "/search/{id}")
-    public SearchEntity getSearchById(@PathVariable Long id) {
-        return searchService.findById(id);
+    public List<Result> getSearchById(@PathVariable Long id) {
+        SearchEntity searchEntity = searchService.findById(id);
+        System.out.println(searchEntity.getKeywords());
+        System.out.println(searchEntity.getSources());
+        List<Result> results = resultService.getResultsByKeywordsAndSources(searchEntity.getKeywords(), searchEntity.getSources());
+        return results;
     }
-
+    @CrossOrigin
     @PostMapping(path= "/addSearch")
     public SearchEntity addSearch(@RequestBody Query query) {
         SearchEntity searchEntity = new SearchEntity();

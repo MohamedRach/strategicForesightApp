@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class ResultService {
 
@@ -18,5 +20,8 @@ public class ResultService {
 
     public void CreateResult(ArrayList<Result> results){
         resultRepository.saveAll(results);
+    }
+    public List<Result> getResultsByKeywordsAndSources(List<String> keywords, List<String> sources) {
+        return resultRepository.findByKeywordInAndSourceIn(keywords, sources);
     }
 }

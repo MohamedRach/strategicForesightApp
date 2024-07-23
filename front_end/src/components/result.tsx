@@ -13,11 +13,12 @@ import { XIcon } from "lucide-react"
 import { Button } from "./ui/button"
 import { BarChartComponent } from "./barChart"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select"
-import { Query, Result, useSearch } from "../api/search.api"
+import { Query, Result, useGetResultsById, useSearch } from "../api/search.api"
 import { Spinner } from "./Spinner"
+import { useLocation } from "react-router-dom"
 interface ResultProps {
   
-  results: Result[]
+  
   defaultLayout: number[] | undefined
   defaultCollapsed?: boolean
   navCollapsedSize: number
@@ -34,6 +35,7 @@ export function ResultPage({
   const [text, setText] = useState<string>("")
   const [sources, setSources] = useState<string[]>([])
   const [keywords, setKeywords] = useState<string[]>([])
+  const [results, setResult] = useState<Result[]>([])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
@@ -63,7 +65,16 @@ export function ResultPage({
       }
     }
   };
-  const { mutateAsync, data, isIdle, isError } = useSearch();
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const id = queryParams.get('id');
+
+  const {data: idData, isLoading: idLoading, isError: idIsError} = useGetResultsById(id || "")
+  const { mutateAsync, data: searchData, isIdle, isError: searchIsError } = useSearch();
+  const data = id ? idData : searchData;
+  const isError = id ? idIsError : searchIsError;
+  const isLoading = id ? idLoading : false  
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const query: Query= { keywords, sources };
@@ -96,12 +107,12 @@ export function ResultPage({
           className={isCollapsed ? "min-w-[50px] transition-all duration-300 ease-in-out" : ""}
         >
           <Nav
-            isCollapsed={isCollapsed}
+            
             links={[
-              { title: "Recherche", label: "", icon: Search, variant: "default" },
-              { title: "Alerts", label: "9", icon: AlertCircle, variant: "ghost" },
-              { title: "Historique", label: "", icon: Archive, variant: "ghost" },
-              { title: "Profile", label: "23", icon: User, variant: "ghost" }
+              { title: "Recherche", href:"/", label: "", icon: Search, variant: "default" },
+              { title: "Alerts", href: "/alerts", label: "9", icon: AlertCircle, variant: "ghost" },
+              { title: "Historique", href: "/history", label: "", icon: Archive, variant: "ghost" },
+              { title: "Profile", href:"/profile", label: "23", icon: User, variant: "ghost" }
             ]}
           />
         </ResizablePanel>
@@ -174,20 +185,20 @@ export function ResultPage({
               </form>
             </div>
             <TabsContent value="all" className="m-0">
-              {isIdle ? (
-                <div className="flex justify-center items-center h-64">
-                    No data to show
-                </div>
-              ) : isError ? (
+              {isError ? (
                 <div className="flex justify-center items-center h-64 text-red-500">
                   Error: Something went wrong try again later
                 </div>
               ) : data && data.length > 0 ? (
                 <ResultList items={data} />
-              ) : (
+              ) : isLoading ? (
                 <div className="flex justify-center items-center h-64 text-gray-500">
                   <Spinner>This my take some time please wait!!</Spinner>
                 </div>
+              ): (
+                <div className="flex justify-center items-center h-64 text-gray-500">
+                  There is no data to show
+                </div> 
               )}            
             </TabsContent>
           </Tabs>
@@ -202,7 +213,7 @@ export function ResultPage({
       <Separator />
       <div className="ml-[300px] grid grid-cols-1">
         <div className="mt-3">
-          <BarChartComponent items={data} isIdle={isIdle}/>
+          <BarChartComponent items={data} isIdle={isLoading}/>
         </div>
       </div>
     </TooltipProvider>
