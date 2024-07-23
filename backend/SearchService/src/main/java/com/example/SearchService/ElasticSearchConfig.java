@@ -22,7 +22,7 @@ public class ElasticSearchConfig extends ElasticsearchConfiguration {
     @Override
     public ClientConfiguration clientConfiguration() {
         return ClientConfiguration.builder()
-                .connectedToLocalhost()
+                .connectedTo("3fd97bdf9fa8:9200")
                 .usingSsl(buildSSLContext())
                 .withBasicAuth("elastic", "12345")
                 .withSocketTimeout(Duration.ofSeconds(30))

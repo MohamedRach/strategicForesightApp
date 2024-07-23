@@ -3,39 +3,31 @@ package com.example.SearchService.Controllers;
 import com.example.SearchService.Domain.ImageUrl;
 import com.example.SearchService.Domain.Query;
 import com.example.SearchService.Domain.Result;
+import com.example.SearchService.Domain.SearchEntity;
 import com.example.SearchService.ScrapingService.FacebookScraper;
 import com.example.SearchService.ScrapingService.InstgrameScraper;
 import com.example.SearchService.ScrapingService.NewsScraper;
 import com.example.SearchService.ScrapingService.ScrapingService;
 import com.example.SearchService.Service.ResultService;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import com.example.SearchService.Service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.net.URI;
-import java.time.Duration;
+
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+
+
 
 @RestController
 public class SearchController {
@@ -50,9 +42,13 @@ public class SearchController {
     @Autowired
     private RestTemplate restTemplate;
 
+    private final SearchService searchService;
+
+
     @Autowired
-    public SearchController(ResultService resultService) {
+    public SearchController(ResultService resultService, SearchService searchService) {
         this.resultService = resultService;
+        this.searchService = searchService;
         this.facebookScraper = new FacebookScraper();
         this.instagramScraper = new InstgrameScraper();
         this.newsScraper = new NewsScraper();
@@ -60,7 +56,7 @@ public class SearchController {
     @CrossOrigin
     @PostMapping(path = "/search")
     public ArrayList<Result> search(@RequestBody Query query) {
-        System.out.println(query);
+        SearchEntity searchEntity  = new SearchEntity();
         List<String> keywords = query.getKeywords();
         List<String> sources = query.getSources();
         ArrayList<Result> results = new ArrayList<>();
@@ -82,8 +78,10 @@ public class SearchController {
                     System.out.println("Unknown source: " + source);
             }
         }
+        searchEntity.setKeywords(keywords);
+        searchEntity.setSources(sources);
         resultService.CreateResult(results);
-        this.stopEventStreaming();
+        searchService.save(searchEntity);
         return results;
     }
     @CrossOrigin
@@ -111,48 +109,24 @@ public class SearchController {
                     .body("Error downloading image: " + e.getMessage());
         }
     }
-
-    @PostMapping(path = "/test")
-    public Query test(@RequestBody Query query) {
-
-        return query;
+    @CrossOrigin
+    @GetMapping(path = "/search")
+    public List<SearchEntity> getAllSearches(){
+        return searchService.findAll();
+    }
+    @CrossOrigin
+    @GetMapping(path = "/search/{id}")
+    public SearchEntity getSearchById(@PathVariable Long id) {
+        return searchService.findById(id);
     }
 
-    @GetMapping("/events")
-    public SseEmitter streamEvents() {
-        SseEmitter emitter = new SseEmitter();
-        this.addEmitter(emitter);
-        this.startEventStreaming();
-        return emitter;
+    @PostMapping(path= "/addSearch")
+    public SearchEntity addSearch(@RequestBody Query query) {
+        SearchEntity searchEntity = new SearchEntity();
+        searchEntity.setKeywords(query.getKeywords());
+        searchEntity.setSources(query.getSources());
+        return searchService.save(searchEntity);
     }
 
-    public void addEmitter(SseEmitter emitter) {
-        emitters.add(emitter);
-        emitter.onCompletion(() -> emitters.remove(emitter));
-        emitter.onTimeout(() -> emitters.remove(emitter));
-    }
-    public void startEventStreaming() {
-        executorService.scheduleAtFixedRate(this::sendEvent, 0, 1, TimeUnit.SECONDS);
-    }
-    public void stopEventStreaming() {
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
-                executorService.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-        }
-    }
-    public void sendEvent() {
-        for (SseEmitter emitter : emitters) {
-            try {
-                emitter.send("in progress");
-            } catch (Exception e) {
-                emitter.complete();
-                emitters.remove(emitter);
-            }
-        }
 
-    }
 }
