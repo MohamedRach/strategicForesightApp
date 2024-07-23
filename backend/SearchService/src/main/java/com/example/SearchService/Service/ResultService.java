@@ -21,7 +21,12 @@ public class ResultService {
     public void CreateResult(ArrayList<Result> results){
         resultRepository.saveAll(results);
     }
+
     public List<Result> getResultsByKeywordsAndSources(List<String> keywords, List<String> sources) {
         return resultRepository.findByKeywordInAndSourceIn(keywords, sources);
+    }
+
+    public void DeleteResult(String id){
+        resultRepository.deleteById(id);
     }
 }

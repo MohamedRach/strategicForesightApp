@@ -52,11 +52,11 @@ public class NewsScraper implements ScrapingService{
                 Result result = new Result();
                 LocalDate today = LocalDate.now();
                 result.setKeyword(keyword);
+                result.setSource("news");
                 result.setDate(today);
                 try {
                     WebElement link = article.findElement(By.cssSelector("a." + linkClass.replace(" ", ".")));
                     result.setCaption(link.getText());
-                    result.setUsername(link.getAttribute("href"));
                     System.out.println("title: " + link.getText());
                     System.out.println("link: " + link.getAttribute("href"));
                 } catch (Exception e) {
@@ -69,7 +69,7 @@ public class NewsScraper implements ScrapingService{
                 try {
                     WebElement source = article.findElement(By.cssSelector("div." + sourceClass.replace(" ", ".")));
                     System.out.println("source: " + source.getText());
-                    result.setSource(source.getText());
+                    result.setUsername(source.getText());
                 } catch (Exception e) {
                     System.out.println("couldn't find source");
                     result.setSource("undefined");

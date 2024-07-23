@@ -62,7 +62,7 @@ export function BarChartComponent({items, isIdle}: BarCharProps) {
         <CardDescription>number of posts published by each user</CardDescription>
       </CardHeader>
       <CardContent>
-        {isIdle ? (
+        {!isIdle ? (
            <div className="flex justify-center items-center h-64 text-gray-500">
                   <Spinner>This my take some time please wait!!</Spinner>
           </div> 

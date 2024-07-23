@@ -132,5 +132,12 @@ public class SearchController {
         return searchService.save(searchEntity);
     }
 
+    @CrossOrigin
+    @DeleteMapping(path = "/search/{id}")
+    public String deleteResult(@PathVariable String id) {
+        resultService.DeleteResult(id);
+        return "deleted success";
+    }
+
 
 }

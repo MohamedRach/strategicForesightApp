@@ -55,7 +55,7 @@ export function ResultPage({
     setSources(newSources)
   }
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === ' ') {
       e.preventDefault();
       const words = text.trim().split(/\s+/);
       if (words.length > 0) {
@@ -71,10 +71,11 @@ export function ResultPage({
   const id = queryParams.get('id');
 
   const {data: idData, isLoading: idLoading, isError: idIsError} = useGetResultsById(id || "")
-  const { mutateAsync, data: searchData, isIdle, isError: searchIsError } = useSearch();
+  const { mutateAsync, data: searchData, isIdle: searchIdle, isError: searchIsError } = useSearch();
   const data = id ? idData : searchData;
   const isError = id ? idIsError : searchIsError;
-  const isLoading = id ? idLoading : false  
+  const isLoading = id ? idLoading : false
+  const isIdle = id ? false: searchIdle
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const query: Query= { keywords, sources };
@@ -195,10 +196,14 @@ export function ResultPage({
                 <div className="flex justify-center items-center h-64 text-gray-500">
                   <Spinner>This my take some time please wait!!</Spinner>
                 </div>
+              ): !isIdle ? (
+                <div className="flex justify-center items-center h-64 text-gray-500">
+                  <Spinner>This my take some time please wait!!</Spinner>
+                </div> 
               ): (
                 <div className="flex justify-center items-center h-64 text-gray-500">
                   There is no data to show
-                </div> 
+                </div>  
               )}            
             </TabsContent>
           </Tabs>
@@ -213,7 +218,8 @@ export function ResultPage({
       <Separator />
       <div className="ml-[300px] grid grid-cols-1">
         <div className="mt-3">
-          <BarChartComponent items={data} isIdle={isLoading}/>
+          <BarChartComponent items={data} isIdle={isIdle}/>
+
         </div>
       </div>
     </TooltipProvider>

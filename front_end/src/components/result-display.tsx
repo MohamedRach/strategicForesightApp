@@ -1,22 +1,36 @@
 import {format} from "date-fns/format"
 import { Separator } from "./ui/separator"
-import { Result, useImage} from "../api/search.api"
+import { Result, useDeleteResult, useImage} from "../api/search.api"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-
 import { useEffect} from "react"
-import { ScrollArea } from "@radix-ui/react-scroll-area"
-
+import { Button } from "./ui/button"
+import {toast, Toaster} from 'react-hot-toast'
 
 interface ResultDisplayProps {
   result: Result | undefined
 }
 export function ResultDisplay({ result }: ResultDisplayProps) {
   const {mutateAsync, data} = useImage()
+  const {mutate, isSuccess, isError} = useDeleteResult()
   useEffect(() => {
     if (result?.img && result?.img.includes("instagram")) {
       mutateAsync({url: result.img})
     }
-  }, [result, mutateAsync]);  
+  }, [result, mutateAsync]);
+
+  const handleClick = (id: string) => {
+    mutate(id)    
+  }
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success('Successfully deleted!')
+    }
+    if(isError) {
+      toast.error("something went wrong!!")
+    } 
+
+  }, [isSuccess, isError])
   return (
     
     <div className="flex h-full flex-col">
@@ -40,14 +54,20 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
                 <div className="line-clamp-1 text-xs">
                   <span className="font-medium">Likes:</span> {result.likes}
                 </div>
-              </div>
+                              </div>
             </div>
+            
             {result.date && (
               <div className="ml-auto text-xs text-muted-foreground">
                 {format(new Date(result.date), "PPpp")}
+                  <div className="mt-[10px]">
+                    <Button onClick={() => handleClick(result.id)} variant="destructive" className="w-[140px]">Delete</Button>
+                  <Toaster />
+                  </div>
               </div>
             )}
-          </div>
+          
+            </div>
           <Separator />
             <div>
             <div className="flex-1 whitespace-pre-wrap p-4 text-sm">

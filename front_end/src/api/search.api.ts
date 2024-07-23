@@ -1,4 +1,4 @@
-import { QueryKey, useMutation, useQuery} from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
 
 
 export type Result = {
@@ -24,6 +24,8 @@ export type Search = {
   createdAt: string,
   updatedAt: string
 }
+
+
 const searchAPI = async (searchData: Query) : Promise<Result[]> => {
   console.log(searchData)
   const response = await fetch('http://localhost:8080/search', {
@@ -53,7 +55,32 @@ const fetchResultsById = async (id: string): Promise<Result[]> => {
   }
   return response.json();
 };
+const deleteItem = async (id: string): Promise<string> => {
+    const response = await fetch(`http://localhost:8080/search/${id}`, {
+      method: 'DELETE',
+    });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
+    }
+    return response.text();
+};
+
+export const useDeleteResult = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<string, Error, string>({
+    mutationFn: deleteItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['results']});
+      console.log('Search deleted successfully');
+    },
+    onError: (error: Error) => {
+      console.error("An error occurred while deleting the search:", error);
+    },
+  });
+};
 export const useGetResultsById = (id: string) => {
   return useQuery<Result[], Error>({
     queryKey: ['results', id],
