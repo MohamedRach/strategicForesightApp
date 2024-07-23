@@ -4,7 +4,7 @@ import { Result, useDeleteResult, useImage} from "../api/search.api"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { useEffect} from "react"
 import { Button } from "./ui/button"
-import {toast, Toaster} from 'react-hot-toast'
+import { useResultStore } from "../hooks/store"
 
 interface ResultDisplayProps {
   result: Result | undefined
@@ -12,22 +12,25 @@ interface ResultDisplayProps {
 export function ResultDisplay({ result }: ResultDisplayProps) {
   const {mutateAsync, data} = useImage()
   const {mutate, isSuccess, isError} = useDeleteResult()
+  const {removeResult} = useResultStore()
   useEffect(() => {
-    if (result?.img && result?.img.includes("instagram")) {
+    if (result?.img && (result?.img.includes("instagram") || result?.img.includes("news"))) {
       mutateAsync({url: result.img})
     }
   }, [result, mutateAsync]);
 
   const handleClick = (id: string) => {
-    mutate(id)    
+    mutate(id)
+    if(result) removeResult(result)
   }
 
   useEffect(() => {
     if (isSuccess) {
-      toast.success('Successfully deleted!')
+      
+      alert("avec succés")
     }
     if(isError) {
-      toast.error("something went wrong!!")
+      alert("erreur essayer plus tard!!")
     } 
 
   }, [isSuccess, isError])
@@ -62,7 +65,7 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
                 {format(new Date(result.date), "PPpp")}
                   <div className="mt-[10px]">
                     <Button onClick={() => handleClick(result.id)} variant="destructive" className="w-[140px]">Delete</Button>
-                  <Toaster />
+                  
                   </div>
               </div>
             )}
@@ -71,7 +74,7 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
           <Separator />
             <div>
             <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
-              {result.caption}
+              {result.href ? (<a className="underline" href={`${result.href}`}> {result.caption}</a>): (result.caption)}
             </div>
             <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
               {data ? ( <img src={data} />) : ( <img src={result.img} />)}
@@ -81,7 +84,7 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
         
       ) : (
         <div className="p-8 text-center text-muted-foreground">
-          No message selected
+          Aucun message sélectionné
         </div>
       )}
     </div>

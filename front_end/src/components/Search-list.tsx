@@ -1,18 +1,27 @@
 import { format, parseISO } from "date-fns";
-import { Search } from "../api/search.api";
+import { Search, useDeleteSearch } from "../api/search.api";
 import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "../lib/utils";
 import { Badge } from "./ui/badge";
-import { redirect, redirectDocument } from "react-router-dom";
+import { Button } from "./ui/button";
+import { MouseEvent, useEffect } from "react";
 interface SearchListProps {
   items: Search[]
 }
 
 export function SearchList({ items }: SearchListProps) {
-  const handleClick = async (id: string) => {
-    console.log(id)
-    return redirectDocument("/")
+  
+  const {mutate, isSuccess, isError} = useDeleteSearch()
+
+  const handleClick = (id: string, e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    mutate(id)
   }
+
+  useEffect(() => {
+    if (isSuccess) alert("avec succés")
+    if (isError) alert("erreur, essayer plus tard")
+  }, [isSuccess, isError])
 
   return (
     <ScrollArea className="h-screen">
@@ -36,7 +45,13 @@ export function SearchList({ items }: SearchListProps) {
                      <div className="font-semibold">{source}</div>
                   ))}
                 </div>
-              
+              <div
+                  className={cn(
+                    "ml-[1000px] text-xs"
+                  )}
+                >
+                  <Button onClick={(e) => handleClick(item.id, e)} variant="destructive">Delete</Button>
+                </div>
             </div>            
               <div className="flex items-center gap-2">
                 Keywords: 

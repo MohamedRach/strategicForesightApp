@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class InstgrameScraper implements ScrapingService{
 
     public static final String classNames = "x1i10hfl xjbqb8w x1ejq31n xd10rxx x1sy0etr x17r0tee x972fbf xcfux6l x1qhh985 xm0m39n x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz _a6hd";
-    public static final String userNameclass = "x1i10hfl xjbqb8w x1ejq31n xd10rxx x1sy0etr x17r0tee x972fbf xcfux6l x1qhh985 xm0m39n x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz  _acan _acao _acat _acaw _aj1- _ap30 _a6hd";
+    public static final String userNameclass = "x1i10hfl xjqpnuy xa49m3k xqeqjp1 x2hbi6w xdl72j9 x2lah0s xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r x2lwn1j xeuugli x1hl2dhg xggy1nq x1ja2u2z x1t137rt x1q0g3np x1lku1pv x1a2a7pz x6s0dn4 xjyslct x1ejq31n xd10rxx x1sy0etr x17r0tee x9f619 x1ypdohk x1f6kntn xwhw2v2 xl56j7k x17ydfre x2b8uid xlyipyv x87ps6o x14atkfc xcdnw81 x1i0vuye xjbqb8w xm3z3ea x1x8b98j x131883w x16mih1h x972fbf xcfux6l x1qhh985 xm0m39n xt0psk2 xt7dq6l xexx8yu x4uap5 x18d9i69 xkhd6sd x1n2onr6 x1n5bzlp xqnirrm xj34u2y x568u83";
     public static final String captionClass = "_ap3a _aaco _aacu _aacx _aad7 _aade";
     public static final String pictureClass = "x5yr21d xu96u03 x10l6tqk x13vifvy x87ps6o xh8yej3";
     public static final String LikesClass = "html-span xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x1hl2dhg x16tdsg8 x1vvkbs";
@@ -65,9 +65,10 @@ public class InstgrameScraper implements ScrapingService{
 
             }
 
-            driver.quit();
+
 
         }
+        driver.quit();
         return results;
     }
 
@@ -86,19 +87,20 @@ public class InstgrameScraper implements ScrapingService{
         });
         try {
             // Sleep for 5 seconds (5000 milliseconds)
-            Thread.sleep(10000);
+            Thread.sleep(20000);
         } catch (InterruptedException e) {
             // Handle the exception
             e.printStackTrace();
         }
 
         try {
-            WebElement usernameElement = innerDriver.findElement(By.cssSelector("a." + classNames.replace(" ", ".")));
+            WebElement usernameElement = innerDriver.findElement(By.cssSelector("a." + userNameclass.replace(" ", ".")));
             result.setUsername(usernameElement.getText());
             System.out.println("username: " + usernameElement.getText());
         } catch (Exception e) {
             System.out.println("couldn't find username");
             result.setUsername("Undefined");
+            throw new RuntimeException(e);
         }
 
         try {

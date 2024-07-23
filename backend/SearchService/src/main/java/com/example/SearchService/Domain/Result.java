@@ -36,6 +36,8 @@ public class Result {
     private String likes;
     @Field(type = FieldType.Text, analyzer = "standard")
     private String username;
+    @Field(type = FieldType.Text, analyzer = "standard")
+    private String href;
     @Field(type = FieldType.Date, analyzer = "standard")
     private LocalDate date;
 }

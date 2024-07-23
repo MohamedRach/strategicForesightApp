@@ -1,14 +1,12 @@
 import { AlertCircle, Archive, Search, User } from "lucide-react"
 import { Nav } from "./nav"
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./ui/resizable"
 import { Separator } from "./ui/separator"
-import { TooltipProvider } from "./ui/tooltip"
 import { Tabs, TabsContent} from "./ui/tabs"
 import { Input } from "./ui/input"
 import { ResultList } from "./result-list"
 import { ResultDisplay } from "./result-display"
 import { useResult } from "../hooks/useResult"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { XIcon } from "lucide-react"
 import { Button } from "./ui/button"
 import { BarChartComponent } from "./barChart"
@@ -16,26 +14,15 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Query, Result, useGetResultsById, useSearch } from "../api/search.api"
 import { Spinner } from "./Spinner"
 import { useLocation } from "react-router-dom"
-interface ResultProps {
-  
-  
-  defaultLayout: number[] | undefined
-  defaultCollapsed?: boolean
-  navCollapsedSize: number
-}
+import { useResultStore } from "../hooks/store"
 
 
-export function ResultPage({
-  defaultLayout = [265, 440, 655],
-  defaultCollapsed = false,
-  navCollapsedSize,
-}: ResultProps) {
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed)
+
+export function ResultPage() {
   const [result] = useResult()
   const [text, setText] = useState<string>("")
   const [sources, setSources] = useState<string[]>([])
   const [keywords, setKeywords] = useState<string[]>([])
-  const [results, setResult] = useState<Result[]>([])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
@@ -69,56 +56,39 @@ export function ResultPage({
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const id = queryParams.get('id');
-
+  const {results, addResult} = useResultStore()
   const {data: idData, isLoading: idLoading, isError: idIsError} = useGetResultsById(id || "")
-  const { mutateAsync, data: searchData, isIdle: searchIdle, isError: searchIsError } = useSearch();
-  const data = id ? idData : searchData;
+  const { mutateAsync, data: searchData,isPending, isError: searchIsError } = useSearch();
   const isError = id ? idIsError : searchIsError;
   const isLoading = id ? idLoading : false
-  const isIdle = id ? false: searchIdle
+  useEffect(() => {
+    if(id && idData && idData.length > 0) {
+      addResult(idData)
+    } else if (!id && searchData && searchData.length > 0) {
+      addResult(searchData)
+    }
+  }, [idData, addResult, id, searchData])
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const query: Query= { keywords, sources };
     mutateAsync(query);
   };
   return (
-    <TooltipProvider delayDuration={0}>
-      <ResizablePanelGroup
-        direction="horizontal"
-        onLayout={(sizes: number[]) => {
-          document.cookie = `react-resizable-panels:layout=${JSON.stringify(sizes)}`;
-        }}
-        className="h-full max-h-[800px] items-stretch"
-      >
+    <>
+    <div className="grid grid-cols-[300px_1fr_1fr] gap-4">
+      <div>
         {/* Left panel (Nav) stays the same */}
-        <ResizablePanel
-          defaultSize={defaultLayout[0]}
-          collapsedSize={navCollapsedSize}
-          collapsible={true}
-          minSize={15}
-          maxSize={20}
-          onCollapse={() => {
-            setIsCollapsed(true);
-            document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(true)}`;
-          }}
-          onExpand={() => {
-            setIsCollapsed(false);
-            document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(false)}`;
-          }}
-          className={isCollapsed ? "min-w-[50px] transition-all duration-300 ease-in-out" : ""}
-        >
-          <Nav
+        <Nav
             
             links={[
               { title: "Recherche", href:"/", label: "", icon: Search, variant: "default" },
-              { title: "Alerts", href: "/alerts", label: "9", icon: AlertCircle, variant: "ghost" },
+              { title: "Alerts", href: "/alerts", label: "", icon: AlertCircle, variant: "ghost" },
               { title: "Historique", href: "/history", label: "", icon: Archive, variant: "ghost" },
-              { title: "Profile", href:"/profile", label: "23", icon: User, variant: "ghost" }
+              { title: "Profile", href:"/profile", label: "", icon: User, variant: "ghost" }
             ]}
-          />
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
+        />
+      </div>
+        <div>
           <Tabs defaultValue="all">
             <div className="flex items-center px-4 py-2">
               <h1 className="text-xl font-bold">Recherche</h1>
@@ -190,38 +160,37 @@ export function ResultPage({
                 <div className="flex justify-center items-center h-64 text-red-500">
                   Error: Something went wrong try again later
                 </div>
-              ) : data && data.length > 0 ? (
-                <ResultList items={data} />
+              ) : results && results.length > 0 ? (
+                <ResultList items={results} />
               ) : isLoading ? (
                 <div className="flex justify-center items-center h-64 text-gray-500">
-                  <Spinner>This my take some time please wait!!</Spinner>
+                  <Spinner>cela peut prendre un certain temps, veuillez patienter!!</Spinner>
                 </div>
-              ): !isIdle ? (
+              ): isPending ? (
                 <div className="flex justify-center items-center h-64 text-gray-500">
-                  <Spinner>This my take some time please wait!!</Spinner>
+                  <Spinner>cela peut prendre un certain temps, veuillez patienter!!</Spinner>
                 </div> 
               ): (
                 <div className="flex justify-center items-center h-64 text-gray-500">
-                  There is no data to show
+                  aucune donnée à afficher
                 </div>  
               )}            
             </TabsContent>
           </Tabs>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={defaultLayout[2]}>
+        </div>
+        <div>
           <ResultDisplay
-             result={data ? data.find((item: Result) => item.id === result.selected) : undefined}
+             result={results ? results.find((item: Result) => item.id === result.selected) : undefined}
           />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+        </div>
+      </div>  
       <Separator />
-      <div className="ml-[300px] grid grid-cols-1">
+      <div className=" ml-[250px] w-[1500px] grid grid-cols-1">
         <div className="mt-3">
-          <BarChartComponent items={data} isIdle={isIdle}/>
+          <BarChartComponent items={results} isLoading={isLoading} isIdle={isPending}/>
 
         </div>
       </div>
-    </TooltipProvider>
+    </>
   );
   }

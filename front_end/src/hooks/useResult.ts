@@ -1,6 +1,6 @@
 import { atom, useAtom } from "jotai";
+import { Result } from "../api/search.api";
 
-import { results, Result } from "../data/data";
 
 
 type config = {
@@ -8,7 +8,7 @@ type config = {
 }
 
 const configAtom = atom<config>({
-  selected: results[0].id
+  selected: null
 })
 
 export function useResult() {

@@ -33,8 +33,9 @@ public class NewsScraper implements ScrapingService{
     @Override
     public ArrayList<Result> Scrape(List<String> keywords) {
         ArrayList<Result> results = new ArrayList<>();
+        WebDriver driver = new ChromeDriver(options);
         for (String keyword : keywords) {
-            WebDriver driver = new ChromeDriver(options);
+
 
             driver.get("https://news.google.com");
 
@@ -57,6 +58,7 @@ public class NewsScraper implements ScrapingService{
                 try {
                     WebElement link = article.findElement(By.cssSelector("a." + linkClass.replace(" ", ".")));
                     result.setCaption(link.getText());
+                    result.setHref(link.getAttribute("href"));
                     System.out.println("title: " + link.getText());
                     System.out.println("link: " + link.getAttribute("href"));
                 } catch (Exception e) {
@@ -86,8 +88,9 @@ public class NewsScraper implements ScrapingService{
                 }
                 results.add(result);
             }
-            driver.quit();
+
         }
+        driver.quit();
         return results;
     }
 }

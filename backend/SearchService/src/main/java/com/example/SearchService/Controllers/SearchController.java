@@ -133,11 +133,17 @@ public class SearchController {
     }
 
     @CrossOrigin
-    @DeleteMapping(path = "/search/{id}")
+    @DeleteMapping(path = "/result/{id}")
     public String deleteResult(@PathVariable String id) {
         resultService.DeleteResult(id);
         return "deleted success";
     }
 
+    @CrossOrigin
+    @DeleteMapping(path = "/search/{id}")
+    public String deleteSearch(@PathVariable Long id) {
+        searchService.deleteById(id);
+        return "deleted success";
+    }
 
 }

@@ -88,9 +88,9 @@ public class FacebookScraper implements ScrapingService{
                 results.add(result);
 
             }
-            driver.quit();
-        }
 
+        }
+        driver.quit();
         return results;
     }
 

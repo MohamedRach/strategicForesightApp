@@ -27,6 +27,7 @@ const chartConfig = {
 interface BarCharProps{
   items: Result[] | undefined
   isIdle: boolean
+  isLoading: boolean
 }
 interface OutputObject {
   user: string;
@@ -51,7 +52,7 @@ function countSourceAppearances(inputArray: Result[] | undefined): OutputObject[
 
   return outputArray;
 }
-export function BarChartComponent({items, isIdle}: BarCharProps) {
+export function BarChartComponent({items, isIdle, isLoading}: BarCharProps) {
   
   const data: OutputObject[] = countSourceAppearances(items)
   console.log(data)
@@ -62,12 +63,7 @@ export function BarChartComponent({items, isIdle}: BarCharProps) {
         <CardDescription>number of posts published by each user</CardDescription>
       </CardHeader>
       <CardContent>
-        {!isIdle ? (
-           <div className="flex justify-center items-center h-64 text-gray-500">
-                  <Spinner>This my take some time please wait!!</Spinner>
-          </div> 
-        ): data && data.length > 0 ? (<ChartContainer config={chartConfig} className="h-[300px] w-[1500px]">
-
+        {data && data.length > 0 ? (<ChartContainer config={chartConfig} className="h-[300px] w-[1500px]">
           <BarChart accessibilityLayer data={data}>
             <CartesianGrid vertical={false} />
             <XAxis
@@ -83,9 +79,17 @@ export function BarChartComponent({items, isIdle}: BarCharProps) {
             />
             <Bar dataKey="nbrofposts" fill="var(--color-desktop)" radius={4} />
           </BarChart>
-        </ChartContainer>):(
+        </ChartContainer>): isLoading ? (
           <div className="flex justify-center items-center h-64 text-gray-500">
-                No data to show
+                <Spinner>cela peut prendre un certain temps, veuillez patienter</Spinner>
+          </div> 
+        ): isIdle ? (
+           <div className="flex justify-center items-center h-64 text-gray-500">
+                <Spinner>cela peut prendre un certain temps, veuillez patienter</Spinner>
+          </div> 
+        ) : (
+           <div className="flex justify-center items-center h-64 text-gray-500">
+                aucune donnée à afficher
           </div> 
         )
         } 

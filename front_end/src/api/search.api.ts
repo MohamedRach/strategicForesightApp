@@ -9,6 +9,7 @@ export type Result = {
   img: string;
   likes: string;
   keyword: string;
+  href: string;
   date: Date
 }
 
@@ -56,6 +57,17 @@ const fetchResultsById = async (id: string): Promise<Result[]> => {
   return response.json();
 };
 const deleteItem = async (id: string): Promise<string> => {
+    const response = await fetch(`http://localhost:8080/result/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
+    }
+    return response.text();
+};
+const deleteSearch = async (id: string): Promise<string> => {
     const response = await fetch(`http://localhost:8080/search/${id}`, {
       method: 'DELETE',
     });
@@ -67,6 +79,22 @@ const deleteItem = async (id: string): Promise<string> => {
     return response.text();
 };
 
+export const useDeleteSearch = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<string, Error, string>({
+    mutationFn: deleteSearch,
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['searches']});
+      console.log('Search deleted successfully');
+    },
+    onError: (error: Error) => {
+      console.error("An error occurred while deleting the search:", error);
+    },
+  });
+};
+
+
 export const useDeleteResult = () => {
   const queryClient = useQueryClient();
 
@@ -74,10 +102,10 @@ export const useDeleteResult = () => {
     mutationFn: deleteItem,
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['results']});
-      console.log('Search deleted successfully');
+      console.log('Result deleted successfully');
     },
     onError: (error: Error) => {
-      console.error("An error occurred while deleting the search:", error);
+      console.error("An error occurred while deleting the result:", error);
     },
   });
 };
