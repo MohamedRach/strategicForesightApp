@@ -4,18 +4,6 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { Result } from "../api/search.api"
 import { Spinner } from "./Spinner"
 
-const chartData = [
-  { month: "January", desktop: 186},
-  { month: "February", desktop: 305},
-  { month: "March", desktop: 237},
-  { month: "April", desktop: 73},
-  { month: "May", desktop: 209},
-  { month: "June", desktop: 214},
-  { month: "Septembre", desktop: 400},
-  { month: "October", desktop: 240},
-  { month: "November", desktop: 300},
-  { month: "Décembre", desktop: 66}
-]
 
 const chartConfig = {
   nbrofposts: {
