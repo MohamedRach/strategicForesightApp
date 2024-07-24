@@ -4,8 +4,12 @@ import com.example.SearchService.Domain.Result;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,12 +45,15 @@ public class FacebookScraper implements ScrapingService{
     public ArrayList<Result> Scrape(List<String> keywords) {
         ArrayList<Result> results = new ArrayList<>();
         WebDriver driver = new ChromeDriver(options);
+        driver.manage().window().maximize();
 
         driver.get("https://facebook.com/");
 
         driver.findElement(By.id("email")).sendKeys("rachidisadek@gmail.com");
         driver.findElement(By.id("pass")).sendKeys("Papa62@2");
-        driver.findElement(By.name("login")).click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.of(10, ChronoUnit.SECONDS));
+        WebElement elemt = wait.until(ExpectedConditions.elementToBeClickable(By.name("login")));
+        elemt.click();
         try {
             // Sleep for 5 seconds (5000 milliseconds)
             Thread.sleep(10000);
