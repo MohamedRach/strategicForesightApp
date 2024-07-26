@@ -1,5 +1,8 @@
 package com.example.SearchService;
 
+import co.elastic.clients.elasticsearch._types.analysis.Analyzer;
+import co.elastic.clients.json.DelegatingDeserializer;
+import co.elastic.clients.json.ObjectDeserializer;
 import org.apache.hc.client5.http.ssl.TrustAllStrategy;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -21,8 +24,9 @@ public class ElasticSearchConfig extends ElasticsearchConfiguration {
 
     @Override
     public ClientConfiguration clientConfiguration() {
+
         return ClientConfiguration.builder()
-                .connectedTo("3fd97bdf9fa8:9200")
+                .connectedTo("f7b075c45a8f:9200")
                 .usingSsl(buildSSLContext())
                 .withBasicAuth("elastic", "12345")
                 .withSocketTimeout(Duration.ofSeconds(30))

@@ -38,6 +38,10 @@ public class Result {
     private String username;
     @Field(type = FieldType.Text, analyzer = "standard")
     private String href;
+    @Field(type = FieldType.Text, analyzer = "standard")
+    private String sentiment;
     @Field(type = FieldType.Date, analyzer = "standard")
     private LocalDate date;
+
+
 }
