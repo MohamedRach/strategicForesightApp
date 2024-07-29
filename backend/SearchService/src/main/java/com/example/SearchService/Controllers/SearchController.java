@@ -118,8 +118,6 @@ public class SearchController {
     @GetMapping(path = "/search/{id}")
     public List<Result> getSearchById(@PathVariable Long id) {
         SearchEntity searchEntity = searchService.findById(id);
-        System.out.println(searchEntity.getKeywords());
-        System.out.println(searchEntity.getSources());
         List<Result> results = resultService.getResultsByKeywordsAndSources(searchEntity.getKeywords(), searchEntity.getSources());
         return results;
     }

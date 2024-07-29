@@ -47,8 +47,8 @@ export function BarChartComponent({items, isIdle, isLoading}: BarCharProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bar Chart</CardTitle>
-        <CardDescription>number of posts published by each user</CardDescription>
+        <CardTitle>nombre de postes publiés par chaque utilisateur</CardTitle>
+        <CardDescription></CardDescription>
       </CardHeader>
       <CardContent>
         {data && data.length > 0 ? (<ChartContainer config={chartConfig} className="h-[300px] w-[1500px]">
