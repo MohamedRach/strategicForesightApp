@@ -26,6 +26,10 @@ public class ResultService {
         return resultRepository.findByKeywordInAndSourceIn(keywords, sources);
     }
 
+    public Result getResultByCaption(String caption) {
+        return resultRepository.findResultByCaption(caption);
+    }
+
     public void DeleteResult(String id){
         resultRepository.deleteById(id);
     }

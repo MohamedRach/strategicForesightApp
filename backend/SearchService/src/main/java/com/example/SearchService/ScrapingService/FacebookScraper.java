@@ -56,7 +56,7 @@ public class FacebookScraper implements ScrapingService{
         elemt.click();
         try {
             // Sleep for 5 seconds (5000 milliseconds)
-            Thread.sleep(10000);
+            Thread.sleep(20000);
         } catch (InterruptedException e) {
             // Handle the exception
             e.printStackTrace();

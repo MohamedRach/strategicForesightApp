@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface ResultRepository extends ElasticsearchRepository<Result, String> {
     List<Result> findByKeywordInAndSourceIn(List<String> keyword, List<String> source);
+    Result findResultByCaption(String caption);
 }
