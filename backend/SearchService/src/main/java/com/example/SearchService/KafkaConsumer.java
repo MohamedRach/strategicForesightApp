@@ -7,6 +7,7 @@ import com.example.SearchService.ScrapingService.FacebookScraper;
 import com.example.SearchService.ScrapingService.InstgrameScraper;
 import com.example.SearchService.ScrapingService.NewsScraper;
 import com.example.SearchService.ScrapingService.ScrapingService;
+import com.example.SearchService.SentimentAnalysis.SentimentClient;
 import com.example.SearchService.Service.ResultService;
 import com.example.SearchService.Service.SearchService;
 import com.example.notificationService.Domain.NotificationEntity;
@@ -31,13 +32,14 @@ public class KafkaConsumer {
     private final ScrapingService newsScraper;
     private final SearchService searchService;
     private final String topic;
+    private SentimentClient sentimentClient;
     @Autowired
-    public KafkaConsumer(ResultService resultService, SearchService searchService, ObjectMapper objectMapper, KafkaTemplate<String, NotificationResponse> kafkaTemplate, @Value("${sadek.kafka.topicc}") String topic) {
+    public KafkaConsumer(ResultService resultService,SentimentClient sentimentClient, SearchService searchService, ObjectMapper objectMapper, KafkaTemplate<String, NotificationResponse> kafkaTemplate, @Value("${sadek.kafka.topicc}") String topic) {
         this.resultService = resultService;
         this.searchService = searchService;
-        this.facebookScraper = new FacebookScraper();
-        this.instagramScraper = new InstgrameScraper();
-        this.newsScraper = new NewsScraper();
+        this.facebookScraper = new FacebookScraper(sentimentClient);
+        this.instagramScraper = new InstgrameScraper(sentimentClient);
+        this.newsScraper = new NewsScraper(sentimentClient);
         this.kafkaTemplate = kafkaTemplate;
         this.topic = topic;
     }

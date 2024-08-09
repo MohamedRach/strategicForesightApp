@@ -1,6 +1,8 @@
 package com.example.SearchService.ScrapingService;
 
 import com.example.SearchService.Domain.Result;
+import com.example.SearchService.Domain.Sentiment;
+import com.example.SearchService.SentimentAnalysis.SentimentClient;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -20,8 +22,8 @@ public class NewsScraper implements ScrapingService{
     public static final String imgClass = "Quavad vwBmvb";
 
     private ChromeOptions options;
-
-    public NewsScraper() {
+    private SentimentClient sentimentClient;
+    public NewsScraper(SentimentClient sentimentClient) {
         options = new ChromeOptions();
         options.addArguments("--headless");
         options.addArguments("--disable-gpu");
@@ -29,6 +31,7 @@ public class NewsScraper implements ScrapingService{
         options.addArguments("--disable-extensions");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
+        this.sentimentClient = sentimentClient;
     }
     @Override
     public ArrayList<Result> Scrape(List<String> keywords) {
@@ -58,13 +61,16 @@ public class NewsScraper implements ScrapingService{
                 try {
                     WebElement link = article.findElement(By.cssSelector("a." + linkClass.replace(" ", ".")));
                     result.setCaption(link.getText());
+                    Sentiment input = Sentiment.builder().input(link.getText()).build();
+                    Sentiment sentiment = sentimentClient.sentiment(input);
+                    result.setSentiment(sentiment.getLabel());
                     result.setHref(link.getAttribute("href"));
                     System.out.println("title: " + link.getText());
                     System.out.println("link: " + link.getAttribute("href"));
                 } catch (Exception e) {
                     System.out.println("couldn't find link");
                     result.setCaption("undefined");
-                    result.setUsername("undefined");
+                    result.setCaption("undefined");
 
                 }
 
@@ -74,7 +80,7 @@ public class NewsScraper implements ScrapingService{
                     result.setUsername(source.getText());
                 } catch (Exception e) {
                     System.out.println("couldn't find source");
-                    result.setSource("undefined");
+                    result.setUsername("undefined");
 
                 }
                 try {

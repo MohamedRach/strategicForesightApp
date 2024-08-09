@@ -1,6 +1,8 @@
 package com.example.SearchService.ScrapingService;
 
 import com.example.SearchService.Domain.Result;
+import com.example.SearchService.Domain.Sentiment;
+import com.example.SearchService.SentimentAnalysis.SentimentClient;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -8,6 +10,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -25,7 +28,10 @@ public class InstgrameScraper implements ScrapingService{
 
     private ChromeOptions options;
 
-    public InstgrameScraper() {
+    private SentimentClient sentimentClient;
+
+
+    public InstgrameScraper(SentimentClient sentimentClient) {
         options = new ChromeOptions();
         options.addArguments("--headless");
         options.addArguments("--disable-gpu");
@@ -33,6 +39,7 @@ public class InstgrameScraper implements ScrapingService{
         options.addArguments("--disable-extensions");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
+        this.sentimentClient = sentimentClient;
     }
 
     @Override
@@ -87,7 +94,7 @@ public class InstgrameScraper implements ScrapingService{
         });
         try {
             // Sleep for 5 seconds (5000 milliseconds)
-            Thread.sleep(20000);
+            Thread.sleep(30000);
         } catch (InterruptedException e) {
             // Handle the exception
             e.printStackTrace();
@@ -105,10 +112,14 @@ public class InstgrameScraper implements ScrapingService{
 
         try {
             WebElement captionElement = innerDriver.findElement(By.cssSelector("h1." + captionClass.replace(" ", ".")));
+            Sentiment input = Sentiment.builder().input(captionElement.getText()).build();
+            Sentiment sentiment = sentimentClient.sentiment(input);
+            result.setSentiment(sentiment.getLabel());
             result.setCaption(captionElement.getText());
             System.out.println("caption: " + captionElement.getText());
         } catch (Exception e) {
             System.out.println("couldn't find caption");
+            e.printStackTrace();
             result.setCaption("Undefined");
         }
 

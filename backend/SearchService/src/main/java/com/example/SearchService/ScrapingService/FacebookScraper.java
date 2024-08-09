@@ -1,6 +1,8 @@
 package com.example.SearchService.ScrapingService;
 
 import com.example.SearchService.Domain.Result;
+import com.example.SearchService.Domain.Sentiment;
+import com.example.SearchService.SentimentAnalysis.SentimentClient;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -30,7 +32,9 @@ public class FacebookScraper implements ScrapingService{
     // chrome options
     private final ChromeOptions options;
 
-    public FacebookScraper() {
+    private SentimentClient sentimentClient;
+
+    public FacebookScraper(SentimentClient sentimentClient) {
         options = new ChromeOptions();
         options.addArguments("--headless");
         options.addArguments("--disable-gpu");
@@ -38,6 +42,7 @@ public class FacebookScraper implements ScrapingService{
         options.addArguments("--disable-extensions");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
+        this.sentimentClient = sentimentClient;
     }
 
 
@@ -119,6 +124,9 @@ public class FacebookScraper implements ScrapingService{
         try {
             WebElement captionElement = divElement.findElement(By.cssSelector("div." + captionClass.replace(" ", ".")));
             String caption = captionElement.getText();
+            Sentiment input = Sentiment.builder().input(caption).build();
+            Sentiment sentiment = sentimentClient.sentiment(input);
+            result.setSentiment(sentiment.getLabel());
             result.setCaption(caption);
             System.out.println("caption: " + caption);
         } catch (Exception e) {

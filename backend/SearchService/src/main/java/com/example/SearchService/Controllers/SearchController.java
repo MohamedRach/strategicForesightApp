@@ -5,6 +5,7 @@ import com.example.SearchService.ScrapingService.FacebookScraper;
 import com.example.SearchService.ScrapingService.InstgrameScraper;
 import com.example.SearchService.ScrapingService.NewsScraper;
 import com.example.SearchService.ScrapingService.ScrapingService;
+import com.example.SearchService.SentimentAnalysis.SentimentClient;
 import com.example.SearchService.Service.ResultService;
 import com.example.SearchService.Service.SearchService;
 import com.example.notificationService.Domain.NotificationResponse;
@@ -47,17 +48,20 @@ public class SearchController {
 
     private final SearchService searchService;
 
+    private SentimentClient sentimentClient;
+
 
     @Autowired
-    public SearchController(ResultService resultService, SearchService searchService, ObjectMapper objectMapper, KafkaTemplate<String, NotificationResponse> kafkaTemplate, @Value("${sadek.kafka.topicc}") String topic) {
+    public SearchController(ResultService resultService, SearchService searchService, ObjectMapper objectMapper, KafkaTemplate<String, NotificationResponse> kafkaTemplate, @Value("${sadek.kafka.topicc}") String topic, SentimentClient sentimentClient) {
         this.resultService = resultService;
         this.searchService = searchService;
-        this.facebookScraper = new FacebookScraper();
-        this.instagramScraper = new InstgrameScraper();
-        this.newsScraper = new NewsScraper();
+        this.facebookScraper = new FacebookScraper(sentimentClient);
+        this.instagramScraper = new InstgrameScraper(sentimentClient);
+        this.newsScraper = new NewsScraper(sentimentClient);
         this.objectMapper = objectMapper;
         this.topic = topic;
         this.kafkaTemplate = kafkaTemplate;
+        this.sentimentClient = sentimentClient;
     }
     @CrossOrigin
     @PostMapping(path = "/search")
@@ -153,12 +157,9 @@ public class SearchController {
 
     @GetMapping("/sentiment")
     public void getSentiment() {
-        List<String> sources = List.of("facebook", "instagram");
-        List<String> keywords = List.of("facebook", "instagram");
-        NotificationResponse notification = NotificationResponse.builder().sources(sources).keywords(keywords).count(3).build();
-        System.out.println(notification);
-        System.out.println(topic);
-        kafkaTemplate.send(topic, notification);
+        Sentiment input = Sentiment.builder().input("i hate you").build();
+        Sentiment output = sentimentClient.sentiment(input);
+        System.out.println(output.getLabel());
     }
 
 }
