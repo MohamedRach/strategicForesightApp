@@ -26,7 +26,7 @@ public class ScheduledTask {
         this.objectMapper = objectMapper;
         this.topic = topic;
     }
-
+    /*
     @Scheduled(fixedRate = 50000)
     public void scheduledTask() {
         List<NotificationEntity> notifications = notificationService.findAll();
@@ -65,5 +65,7 @@ public class ScheduledTask {
         String payload = objectMapper.writeValueAsString(notification);
         kafkaTemplate.send(topic, notification);
     }
+    */
+
 
 }
