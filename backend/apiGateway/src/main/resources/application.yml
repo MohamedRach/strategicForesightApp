@@ -1,0 +1,25 @@
+eureka:
+  client:
+    register-with-eureka: false
+server:
+  port: 8222
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+
+        - id: searchService
+          uri: http://localhost:8080
+          predicates:
+            - Path= /**
+        - id: notificationService
+          uri: http://localhost:8090
+          predicates:
+            - Path= /**
+  application:
+    name: apiGateway
+  config:
+    import: optional:configserver:http://localhost:8888
