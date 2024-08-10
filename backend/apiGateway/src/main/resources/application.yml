@@ -12,7 +12,7 @@ spring:
       routes:
 
         - id: searchService
-          uri: http://localhost:8080
+          uri: http://localhost:8070
           predicates:
             - Path= /**
         - id: notificationService
@@ -21,5 +21,10 @@ spring:
             - Path= /**
   application:
     name: apiGateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/my_realm
   config:
     import: optional:configserver:http://localhost:8888
