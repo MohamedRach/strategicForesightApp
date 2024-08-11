@@ -29,7 +29,7 @@ export type Search = {
 
 const searchAPI = async (searchData: Query) : Promise<Result[]> => {
   console.log(searchData)
-  const response = await fetch('http://localhost:8080/search', {
+  const response = await fetch('http://localhost:8070/search', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ const searchAPI = async (searchData: Query) : Promise<Result[]> => {
 };
 
 const fetchAllSearches = async () => {
-  const response = await fetch('http://localhost:8080/search');
+  const response = await fetch('http://localhost:8070/search');
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
@@ -50,7 +50,7 @@ const fetchAllSearches = async () => {
 };
 
 const fetchResultsById = async (id: string): Promise<Result[]> => {
-  const response = await fetch(`http://localhost:8080/search/${id}`);
+  const response = await fetch(`http://localhost:8070/search/${id}`);
   
   if (!response.ok) {
     throw new Error('Network response was not ok');
@@ -58,7 +58,7 @@ const fetchResultsById = async (id: string): Promise<Result[]> => {
   return response.json();
 };
 const deleteItem = async (id: string): Promise<string> => {
-    const response = await fetch(`http://localhost:8080/result/${id}`, {
+    const response = await fetch(`http://localhost:8070/result/${id}`, {
       method: 'DELETE',
     });
 
@@ -69,7 +69,7 @@ const deleteItem = async (id: string): Promise<string> => {
     return response.text();
 };
 const deleteSearch = async (id: string): Promise<string> => {
-    const response = await fetch(`http://localhost:8080/search/${id}`, {
+    const response = await fetch(`http://localhost:8070/search/${id}`, {
       method: 'DELETE',
     });
 

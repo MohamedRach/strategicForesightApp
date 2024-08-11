@@ -15,15 +15,16 @@ import { Query, Result, useGetResultsById, useSearch } from "../api/search.api"
 import { Spinner } from "./Spinner"
 import { useLocation } from "react-router-dom"
 import { useResultStore } from "../hooks/store"
-
+import { useAuth } from "../hooks/useAuth"
+import { useKeycloak } from "@react-keycloak/web"
 
 
 export function ResultPage() {
+  const { keycloak, initialized} = useKeycloak()
   const [result] = useResult()
   const [text, setText] = useState<string>("")
   const [sources, setSources] = useState<string[]>([])
   const [keywords, setKeywords] = useState<string[]>([])
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
   };
@@ -57,6 +58,7 @@ export function ResultPage() {
   const queryParams = new URLSearchParams(location.search);
   const id = queryParams.get('id');
   const {results, addResult} = useResultStore()
+  
   const {data: idData, isLoading: idLoading, isError: idIsError} = useGetResultsById(id || "")
   const { mutateAsync, data: searchData,isPending, isError: searchIsError } = useSearch();
   const isError = id ? idIsError : searchIsError;
@@ -73,6 +75,7 @@ export function ResultPage() {
     const query: Query= { keywords, sources };
     mutateAsync(query);
   };
+  
   return (
     <>
     <div className="grid grid-cols-[300px_1fr_1fr] gap-4">

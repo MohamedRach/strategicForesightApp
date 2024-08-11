@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
@@ -8,7 +7,8 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { HistoryPage } from './components/history.tsx';
-
+import { ReactKeycloakProvider} from '@react-keycloak/web';
+import keycloak from './hooks/keycloak.ts';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -18,13 +18,21 @@ const router = createBrowserRouter([
     path: "/history",
     element: <HistoryPage />,
   },
+  
 ]);
 const queryClient = new QueryClient()
 
+const initOptions = {
+  onLoad: "login-required",
+  enableLogging: true,
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+  
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+    <ReactKeycloakProvider  authClient={keycloak} initOptions={initOptions}>
+    <RouterProvider router={router} />
+    </ReactKeycloakProvider>
     </QueryClientProvider>
-  </React.StrictMode>,
+  
 )
