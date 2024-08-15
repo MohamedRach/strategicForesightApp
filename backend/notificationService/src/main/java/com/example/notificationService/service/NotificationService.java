@@ -5,6 +5,7 @@ import com.example.notificationService.Repository.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,6 +29,10 @@ public class NotificationService {
 
     public void delete(Long id) {
         notificationRepository.deleteById(id);
+    }
+
+    public void update(Long id, LocalDateTime now) {
+        notificationRepository.updateUpdatedAt(id, now);
     }
 
 }

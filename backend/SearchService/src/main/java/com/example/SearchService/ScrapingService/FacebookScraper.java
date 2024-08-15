@@ -49,7 +49,7 @@ public class FacebookScraper implements ScrapingService{
     @Override
     public ArrayList<Result> Scrape(List<String> keywords) {
         ArrayList<Result> results = new ArrayList<>();
-        WebDriver driver = new ChromeDriver(options);
+        WebDriver driver = new ChromeDriver();
         driver.manage().window().maximize();
 
         driver.get("https://facebook.com/");
@@ -102,7 +102,7 @@ public class FacebookScraper implements ScrapingService{
             }
 
         }
-        driver.quit();
+        //driver.quit();
         return results;
     }
 

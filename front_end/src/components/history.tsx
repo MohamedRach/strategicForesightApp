@@ -5,12 +5,13 @@ import { Tabs, TabsContent} from "./ui/tabs"
 import {useGetAllSearches} from "../api/search.api"
 import { Spinner } from "./Spinner"
 import { SearchList } from "./Search-list"
-import { useAuth } from "../hooks/useAuth"
+import { useKeycloak } from "@react-keycloak/web"
+
 
 
 export function HistoryPage() {
-  console.log(useAuth.getState().user)
-  const { data, isError, isLoading } = useGetAllSearches();
+  const { keycloak } = useKeycloak()
+  const { data, isError, isLoading } = useGetAllSearches(keycloak.token);
   return (
     <div className="grid grid-cols-[300px_1fr] gap-4">
         <div>

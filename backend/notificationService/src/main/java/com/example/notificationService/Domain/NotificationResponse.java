@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "notification")
+@Table(name = "alert")
 @Entity
 public class NotificationResponse {
     @Id
@@ -20,15 +20,18 @@ public class NotificationResponse {
     private Long id;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "search_keywords", joinColumns = @JoinColumn(name = "search_id"))
+    @CollectionTable(name = "keywords", joinColumns = @JoinColumn(name = "alert_id"))
     @Column(name = "keyword")
     private List<String> keywords ;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "search_sources", joinColumns = @JoinColumn(name = "search_id"))
+    @CollectionTable(name = "sources", joinColumns = @JoinColumn(name = "alert_id"))
     @Column(name = "source")
     private List<String> sources ;
 
     @Column(name = "count")
     private Integer count;
+
+    @Column(name = "searchId")
+    private Long searchId;
 }

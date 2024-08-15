@@ -9,6 +9,7 @@ import {
 import { HistoryPage } from './components/history.tsx';
 import { ReactKeycloakProvider} from '@react-keycloak/web';
 import keycloak from './hooks/keycloak.ts';
+import { AlertPage } from './components/alertPage.tsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
   {
     path: "/history",
     element: <HistoryPage />,
+  },
+  {
+    path: "/alerts",
+    element: <AlertPage />,
   },
   
 ]);

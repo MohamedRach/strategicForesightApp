@@ -26,18 +26,20 @@ public class ScheduledTask {
         this.objectMapper = objectMapper;
         this.topic = topic;
     }
-    /*
-    @Scheduled(fixedRate = 50000)
+
+    @Scheduled(fixedRate = 500000)
     public void scheduledTask() {
         List<NotificationEntity> notifications = notificationService.findAll();
         LocalDateTime now = LocalDateTime.now();
         for (NotificationEntity notification : notifications) {
+            System.out.println(notification);
             LocalDateTime updatedAt = notification.getUpdatedAt();
             Duration duration = Duration.between(updatedAt, now);
             if (duration.toDays() >= 1 && notification.getFrequency().equals("every day")) {
                 System.out.println("day");
                 try {
                     sendNotification(notification);
+                    notificationService.update(notification.getId(), LocalDateTime.now());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -46,6 +48,7 @@ public class ScheduledTask {
                 System.out.println("week");
                 try {
                     sendNotification(notification);
+                    notificationService.update(notification.getId(), LocalDateTime.now());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -54,6 +57,7 @@ public class ScheduledTask {
                 System.out.println("month");
                 try {
                     sendNotification(notification);
+                    notificationService.update(notification.getId(), LocalDateTime.now());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -65,7 +69,7 @@ public class ScheduledTask {
         String payload = objectMapper.writeValueAsString(notification);
         kafkaTemplate.send(topic, notification);
     }
-    */
+
 
 
 }

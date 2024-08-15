@@ -17,18 +17,19 @@ public class AlertNotification {
         this.alertService = alertService;
     }
 
-    @GetMapping(path = "/alert")
+    @GetMapping(path = "/notification/alert")
     public List<NotificationResponse> getAlerts() {
         return alertService.findbyCountIsNotNull();
     }
 
-    @DeleteMapping(path = "/alert/{id}")
+    @DeleteMapping(path = "/notification/alert/{id}")
     public void deleteAlert(@PathVariable Long id) {
         alertService.deleteAlert(id);
     }
 
-    @PostMapping(path = "/alert")
+    @PostMapping(path = "/notification/alert")
     public NotificationResponse addAlert(@RequestBody NotificationResponse notificationResponse) {
+        System.out.println("hhhhhhh");
         return alertService.createAlert(notificationResponse);
     }
 

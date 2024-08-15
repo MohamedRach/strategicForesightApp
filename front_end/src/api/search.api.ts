@@ -1,5 +1,4 @@
-import { useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
-
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export type Result = {
   id: string;
@@ -10,84 +9,100 @@ export type Result = {
   likes: string;
   keyword: string;
   href: string;
-  date: Date
-}
+  sentiment: string;
+  date: Date;
+};
 
 export type Query = {
-  keywords: string[]
-  sources: string[]
-}
+  keywords: string[];
+  sources: string[];
+};
 
 export type Search = {
-  id: string
-  keywords: string[]
-  sources: string[]
-  createdAt: string,
-  updatedAt: string
-}
+  id: string;
+  keywords: string[];
+  sources: string[];
+  createdAt: string;
+  updatedAt: string;
+};
 
-
-const searchAPI = async (searchData: Query) : Promise<Result[]> => {
-  console.log(searchData)
-  const response = await fetch('http://localhost:8070/search', {
-    method: 'POST',
+const searchAPI = async (searchData: Query, token: string | undefined): Promise<Result[]> => {
+  const response = await fetch("http://localhost:8222/search", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-    },    
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
     body: JSON.stringify(searchData),
   });
 
-  
   return response.json();
 };
 
-const fetchAllSearches = async () => {
-  const response = await fetch('http://localhost:8070/search');
+const fetchAllSearches = async (token: string | undefined) => {
+  const response = await fetch("http://localhost:8222/search", {
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
   if (!response.ok) {
-    throw new Error('Network response was not ok');
+    throw new Error("Network response was not ok");
   }
   return response.json();
 };
 
-const fetchResultsById = async (id: string): Promise<Result[]> => {
-  const response = await fetch(`http://localhost:8070/search/${id}`);
-  
+const fetchResultsById = async (id: string, token: string | undefined): Promise<Result[]> => {
+  const response = await fetch(`http://localhost:8222/search/${id}`, {
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
   if (!response.ok) {
-    throw new Error('Network response was not ok');
+    throw new Error("Network response was not ok");
   }
   return response.json();
 };
-const deleteItem = async (id: string): Promise<string> => {
-    const response = await fetch(`http://localhost:8070/result/${id}`, {
-      method: 'DELETE',
-    });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message);
-    }
-    return response.text();
-};
-const deleteSearch = async (id: string): Promise<string> => {
-    const response = await fetch(`http://localhost:8070/search/${id}`, {
-      method: 'DELETE',
-    });
+const deleteItem = async (id: string, token: string | undefined): Promise<string> => {
+  const response = await fetch(`http://localhost:8222/result/${id}`, {
+    method: "DELETE",
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message);
-    }
-    return response.text();
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message);
+  }
+  return response.text();
 };
 
-export const useDeleteSearch = () => {
+const deleteSearch = async (id: string, token: string | undefined): Promise<string> => {
+  const response = await fetch(`http://localhost:8222/search/${id}`, {
+    method: "DELETE",
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message);
+  }
+  return response.text();
+};
+
+export const useDeleteSearch = (token: string | undefined) => {
   const queryClient = useQueryClient();
 
   return useMutation<string, Error, string>({
-    mutationFn: deleteSearch,
+    mutationFn: (id: string) => deleteSearch(id, token),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['searches']});
-      console.log('Search deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ["searches"] });
+      console.log("Search deleted successfully");
     },
     onError: (error: Error) => {
       console.error("An error occurred while deleting the search:", error);
@@ -95,77 +110,75 @@ export const useDeleteSearch = () => {
   });
 };
 
-
-export const useDeleteResult = () => {
+export const useDeleteResult = (token: string | undefined) => {
   const queryClient = useQueryClient();
 
   return useMutation<string, Error, string>({
-    mutationFn: deleteItem,
+    mutationFn: (id: string) => deleteItem(id, token),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['results']});
-      console.log('Result deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ["results"] });
+      console.log("Result deleted successfully");
     },
     onError: (error: Error) => {
       console.error("An error occurred while deleting the result:", error);
     },
   });
 };
-export const useGetResultsById = (id: string) => {
+
+export const useGetResultsById = (id: string, token: string | undefined) => {
   return useQuery<Result[], Error>({
-    queryKey: ['results', id],
-    queryFn: () => fetchResultsById(id),
+    queryKey: ["results", id],
+    queryFn: () => fetchResultsById(id, token),
   });
 };
 
-export const useGetAllSearches = () => {
-  return useQuery({queryKey:['searches'], queryFn:fetchAllSearches});
+export const useGetAllSearches = (token: string | undefined) => {
+  return useQuery({ queryKey: ["searches"], queryFn: () => fetchAllSearches(token) });
 };
 
 type Body = {
-  url : string
-}
-const getImage = async (img: Body | undefined) : Promise<string> => {
-    const response = await fetch('http://localhost:8080/download-image', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(img),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Error downloading image: ${response.statusText}`);
-    }
-
-    const dataUrl = await response.text();
-    return dataUrl;  
+  url: string;
 };
 
-export const useImage = () => {
-  const mutation = useMutation<string, Error, Body>({
-    mutationFn: getImage,
+const getImage = async (img: Body | undefined, token: string | undefined): Promise<string> => {
+  const response = await fetch("http://localhost:8080/download-image", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(img),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error downloading image: ${response.statusText}`);
+  }
+
+  const dataUrl = await response.text();
+  return dataUrl;
+};
+
+export const useImage = (token: string | undefined) => {
+  return useMutation<string, Error, Body>({
+    mutationFn: (img: Body) => getImage(img, token),
     onSuccess: (data) => {
-      console.log(data)
+      console.log(data);
     },
     onError: (error: Error) => {
-      console.log(error)
-    }
-  })
-  return mutation
+      console.log(error);
+    },
+  });
+};
 
-}
-
-export const useSearch = () => {
-  const mutation = useMutation<Result[], Error, Query>({
-    mutationFn: searchAPI,
+export const useSearch = (token: string | undefined) => {
+  return useMutation<Result[], Error, Query>({
+    mutationFn: (searchData: Query) => searchAPI(searchData, token),
     onSuccess: (data) => {
-      console.log(data)
+      console.log(data);
     },
     onError: (error: Error) => {
-      // Handle error here
       console.error("An error occurred:", error);
     },
   });
+};
 
-  return mutation;
-}

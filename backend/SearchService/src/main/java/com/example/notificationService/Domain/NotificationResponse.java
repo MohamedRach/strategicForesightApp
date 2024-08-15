@@ -30,4 +30,7 @@ public class NotificationResponse {
 
     @Column(name = "count")
     private int count;
+
+    @Column(name= "searchId")
+    private Long searchId;
 }

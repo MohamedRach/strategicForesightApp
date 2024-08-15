@@ -63,7 +63,7 @@ public class SearchController {
         this.kafkaTemplate = kafkaTemplate;
         this.sentimentClient = sentimentClient;
     }
-    @CrossOrigin
+
     @PostMapping(path = "/search")
     public ArrayList<Result> search(@RequestBody Query query) {
         SearchEntity searchEntity  = new SearchEntity();
@@ -94,7 +94,7 @@ public class SearchController {
         searchService.save(searchEntity);
         return results;
     }
-    @CrossOrigin
+
     @PostMapping("/download-image")
     public ResponseEntity<String> downloadImage(@RequestBody ImageUrl imageUrl) {
         try {
@@ -120,19 +120,20 @@ public class SearchController {
                     .body("Error downloading image: " + e.getMessage());
         }
     }
-    @CrossOrigin
+
     @GetMapping(path = "/search")
     public List<SearchEntity> getAllSearches(){
         return searchService.findAll();
     }
-    @CrossOrigin
+
+
     @GetMapping(path = "/search/{id}")
     public List<Result> getSearchById(@PathVariable Long id) {
         SearchEntity searchEntity = searchService.findById(id);
         List<Result> results = resultService.getResultsByKeywordsAndSources(searchEntity.getKeywords(), searchEntity.getSources());
         return results;
     }
-    @CrossOrigin
+
     @PostMapping(path= "/addSearch")
     public SearchEntity addSearch(@RequestBody Query query) {
         SearchEntity searchEntity = new SearchEntity();
@@ -141,14 +142,14 @@ public class SearchController {
         return searchService.save(searchEntity);
     }
 
-    @CrossOrigin
+
     @DeleteMapping(path = "/result/{id}")
     public String deleteResult(@PathVariable String id) {
         resultService.DeleteResult(id);
         return "deleted success";
     }
 
-    @CrossOrigin
+
     @DeleteMapping(path = "/search/{id}")
     public String deleteSearch(@PathVariable Long id) {
         searchService.deleteById(id);

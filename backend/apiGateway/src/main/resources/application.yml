@@ -10,15 +10,17 @@ spring:
         locator:
           enabled: true
       routes:
+        - id: notificationService
+          uri: http://localhost:8090
+          predicates:
+            - Path= /notification/**
 
         - id: searchService
           uri: http://localhost:8070
           predicates:
             - Path= /**
-        - id: notificationService
-          uri: http://localhost:8090
-          predicates:
-            - Path= /**
+
+
   application:
     name: apiGateway
   security:

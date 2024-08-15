@@ -89,9 +89,9 @@ public class KafkaConsumer {
         }
         searchEntity.setKeywords(keywords);
         searchEntity.setSources(sources);
-        NotificationResponse notificationResponse = NotificationResponse.builder().sources(sources).keywords(keywords).count(results.size()).build();
         resultService.CreateResult(results);
-        searchService.save(searchEntity);
+        SearchEntity search = searchService.save(searchEntity);
+        NotificationResponse notificationResponse = NotificationResponse.builder().sources(sources).keywords(keywords).count(results.size()).searchId(search.getId()).build();
         try {
             sendNotification(notificationResponse);
         } catch (Exception e) {

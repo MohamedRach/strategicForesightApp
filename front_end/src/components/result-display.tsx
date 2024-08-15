@@ -5,13 +5,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { useEffect} from "react"
 import { Button } from "./ui/button"
 import { useResultStore } from "../hooks/store"
+import { useKeycloak } from "@react-keycloak/web"
+import { Badge } from "./ui/badge"
 
 interface ResultDisplayProps {
   result: Result | undefined
 }
 export function ResultDisplay({ result }: ResultDisplayProps) {
-  const {mutateAsync, data} = useImage()
-  const {mutate, isSuccess, isError} = useDeleteResult()
+  const { keycloak } = useKeycloak()
+  const {mutateAsync, data} = useImage(keycloak.token)
+  const {mutate, isSuccess, isError} = useDeleteResult(keycloak.token)
   const {removeResult} = useResultStore()
   useEffect(() => {
     if (result?.img && (result?.img.includes("instagram") || result?.img.includes("news"))) {
@@ -57,7 +60,12 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
                 <div className="line-clamp-1 text-xs">
                   <span className="font-medium">Likes:</span> {result.likes}
                 </div>
-                              </div>
+                <div>
+                 <Badge className={`text-white ${result.sentiment === 'positive' ? 'bg-green-500' : 'bg-red-500'}`}>
+                  {result.sentiment}
+                  </Badge>
+                </div>
+              </div>
             </div>
             
             {result.date && (
