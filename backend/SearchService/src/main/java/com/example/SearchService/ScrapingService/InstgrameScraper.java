@@ -83,7 +83,7 @@ public class InstgrameScraper implements ScrapingService{
         driver.quit();
         return results;
     }
-
+    // retrieving data from each post
     private Result getResult(String post, String keyword) {
         Result result = new Result();
         LocalDate today = LocalDate.now();
@@ -147,6 +147,7 @@ public class InstgrameScraper implements ScrapingService{
         }
 
         try {
+            // Comments
             List<Response> responses = new ArrayList<>();
             List<WebElement> userCommentsElement = innerDriver.findElements(By.cssSelector("a." + userCommentClass.replace(" ", ".")))
                     .stream().filter(user -> !user.getText().equals(result.getUsername())).toList();

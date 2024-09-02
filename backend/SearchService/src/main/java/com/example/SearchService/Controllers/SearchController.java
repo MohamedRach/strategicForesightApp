@@ -33,7 +33,6 @@ public class SearchController {
     private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private final ScrapingService facebookScraper;
     private final ScrapingService instagramScraper;
-    private final ScrapingService newsScraper;
     private final ScrapingService twitterScraper;
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, NotificationResponse> kafkaTemplate;
@@ -55,7 +54,6 @@ public class SearchController {
         this.searchService = searchService;
         this.facebookScraper = new FacebookScraper(sentimentClient);
         this.instagramScraper = new InstgrameScraper(sentimentClient);
-        this.newsScraper = new NewsScraper(sentimentClient);
         this.twitterScraper = new TwitterScraper(sentimentClient);
         this.objectMapper = objectMapper;
         this.topic = topic;
@@ -78,10 +76,6 @@ public class SearchController {
                 case "instagram":
                     ArrayList<Result> instagramResults = instagramScraper.Scrape(keywords);
                     results.addAll(instagramResults);
-                    break;
-                case "news":
-                    ArrayList<Result> newsResults = newsScraper.Scrape(keywords);
-                    results.addAll(newsResults);
                     break;
                 case "twitter":
                     ArrayList<Result> twitterResults = twitterScraper.Scrape(keywords);
@@ -159,10 +153,6 @@ public class SearchController {
         return "deleted success";
     }
 
-    @GetMapping("/test")
-    public void getSentiment() {
-       List<String> keywords = List.of("olympics");
-       twitterScraper.Scrape(keywords);
-    }
+
 
 }

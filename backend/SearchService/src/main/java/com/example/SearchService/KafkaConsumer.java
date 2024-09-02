@@ -5,8 +5,8 @@ import com.example.SearchService.Domain.Result;
 import com.example.SearchService.Domain.SearchEntity;
 import com.example.SearchService.ScrapingService.FacebookScraper;
 import com.example.SearchService.ScrapingService.InstgrameScraper;
-import com.example.SearchService.ScrapingService.NewsScraper;
 import com.example.SearchService.ScrapingService.ScrapingService;
+import com.example.SearchService.ScrapingService.TwitterScraper;
 import com.example.SearchService.SentimentAnalysis.SentimentClient;
 import com.example.SearchService.Service.ResultService;
 import com.example.SearchService.Service.SearchService;
@@ -29,8 +29,8 @@ public class KafkaConsumer {
     private final KafkaTemplate<String, NotificationResponse> kafkaTemplate;
     private final ScrapingService facebookScraper;
     private final ScrapingService instagramScraper;
-    private final ScrapingService newsScraper;
     private final SearchService searchService;
+    private final ScrapingService twitterScraper;
     private final String topic;
     private SentimentClient sentimentClient;
     @Autowired
@@ -39,7 +39,7 @@ public class KafkaConsumer {
         this.searchService = searchService;
         this.facebookScraper = new FacebookScraper(sentimentClient);
         this.instagramScraper = new InstgrameScraper(sentimentClient);
-        this.newsScraper = new NewsScraper(sentimentClient);
+        this.twitterScraper = new TwitterScraper(sentimentClient);
         this.kafkaTemplate = kafkaTemplate;
         this.topic = topic;
     }
@@ -75,14 +75,15 @@ public class KafkaConsumer {
                         }
                     }
                     break;
-                case "news":
-                    ArrayList<Result> newsResults = newsScraper.Scrape(keywords);
-                    for (Result newsResult : newsResults) {
-                        if (resultService.getResultByCaption(newsResult.getCaption()) == null) {
-                            results.add(newsResult);
+                case "twitter":
+                    ArrayList<Result> twitterResults = twitterScraper.Scrape(keywords);
+                    for (Result twitterResult : twitterResults) {
+                        if (resultService.getResultByCaption(twitterResult.getCaption()) == null){
+                            results.add(twitterResult);
                         }
                     }
                     break;
+
                 default:
                     System.out.println("Unknown source: " + source);
             }

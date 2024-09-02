@@ -55,6 +55,10 @@ public class TwitterScraper implements ScrapingService{
         for (String keyword: keywords) {
             driver.get("https://x.com/");
             driver.findElement(By.xpath("//a[@href='/login']")).click();
+            /*
+            *
+            * Login logic
+            * */
             try {
                 // Sleep for 5 seconds (5000 milliseconds)
                 Thread.sleep(7000);
@@ -95,6 +99,11 @@ public class TwitterScraper implements ScrapingService{
                 // Handle the exception
                 e.printStackTrace();
             }
+            /*
+             *
+             * Launching a search
+             * */
+
             driver.findElement(By.xpath("//input[@placeholder='Chercher']")).sendKeys(keyword + Keys.ENTER);
             try {
                 // Sleep for 5 seconds (5000 milliseconds)
@@ -107,7 +116,10 @@ public class TwitterScraper implements ScrapingService{
 
             // Store the original window handle
             String originalWindow = driver.getWindowHandle();
-
+            /*
+             *
+             * Scrolling & collecting posts
+             * */
             Integer tweetIndex = 0;
             int scrollPosition = 4000;
             while (tweetIndex < 10) {
@@ -142,6 +154,11 @@ public class TwitterScraper implements ScrapingService{
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
+
+                            /*
+                             *
+                             * Collecting data
+                             * */
                             Result result = new Result();
                             List<String> usernames = driver.findElements(By.cssSelector("div." + UsernameClass.replace(" ", ".")))
                                     .stream()

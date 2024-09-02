@@ -53,7 +53,9 @@ public class FacebookScraper implements ScrapingService{
         driver.manage().window().maximize();
 
         driver.get("https://facebook.com/");
-
+        /*
+        * login logic
+        * */
         driver.findElement(By.id("email")).sendKeys("rachidisadek@gmail.com");
         driver.findElement(By.id("pass")).sendKeys("Papa62@2");
         WebDriverWait wait = new WebDriverWait(driver, Duration.of(10, ChronoUnit.SECONDS));
@@ -66,6 +68,9 @@ public class FacebookScraper implements ScrapingService{
             // Handle the exception
             e.printStackTrace();
         }
+        /*
+         * launch a search in facebook
+         * */
         for (String keyword : keywords) {
             driver.findElement(By.xpath("//input[@placeholder='Search Facebook']")).sendKeys(keyword + Keys.ENTER);
             try {
@@ -78,7 +83,9 @@ public class FacebookScraper implements ScrapingService{
             WebElement div = driver.findElement(By.xpath("//div[@role='feed']"));
             List<WebElement> divElements = new ArrayList<>();
             int i = 0;
-
+            /*
+             * collect posts in facebook feed
+             * */
             while (i < 15) {
                 List<WebElement> divElement = div.findElements(By.xpath("./div"));
                 for (WebElement element : divElement) {
@@ -95,6 +102,9 @@ public class FacebookScraper implements ScrapingService{
                 }
                 i++;
             }
+            /*
+             * retrieve data from each post collected
+             * */
             for (WebElement divElement : divElements) {
                 Result result = getResult(divElement, keyword);
                 results.add(result);
@@ -165,18 +175,7 @@ public class FacebookScraper implements ScrapingService{
             result.setLikes("undefined");
             System.out.println("couldn't find number of likes");
         }
-        try {
-            WebElement reelElement = divElement.findElement(By.cssSelector("a." + reelClass.replace(" ", ".")));
-            String reel = reelElement.getAttribute("src");
-            result.setImg(reel);
-            System.out.println("reel: " + reel);
-        } catch (Exception e) {
-            //e.printStackTrace();
-            if (result.getImg().equals("undefined")) {
-                result.setImg("undefined");
-            }
-            System.out.println("couldn't find reel");
-        }
+
         return result;
     }
 }
