@@ -42,6 +42,8 @@ public class Result {
     private String sentiment;
     @Field(type = FieldType.Date, analyzer = "standard")
     private LocalDate date;
+    @Field(type = FieldType.Nested)
+    private List<Response> responses;
 
 
 }

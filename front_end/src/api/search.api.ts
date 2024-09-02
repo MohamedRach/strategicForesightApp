@@ -11,7 +11,14 @@ export type Result = {
   href: string;
   sentiment: string;
   date: Date;
+  responses: Response[]
 };
+
+export type Response = {
+  username: string;
+  tweet: string;
+  sentiment: string
+}
 
 export type Query = {
   keywords: string[];

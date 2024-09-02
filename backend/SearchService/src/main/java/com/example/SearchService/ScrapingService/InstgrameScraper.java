@@ -1,5 +1,6 @@
 package com.example.SearchService.ScrapingService;
 
+import com.example.SearchService.Domain.Response;
 import com.example.SearchService.Domain.Result;
 import com.example.SearchService.Domain.Sentiment;
 import com.example.SearchService.SentimentAnalysis.SentimentClient;
@@ -18,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.min;
+
 public class InstgrameScraper implements ScrapingService{
 
     public static final String classNames = "x1i10hfl xjbqb8w x1ejq31n xd10rxx x1sy0etr x17r0tee x972fbf xcfux6l x1qhh985 xm0m39n x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz _a6hd";
@@ -25,6 +28,7 @@ public class InstgrameScraper implements ScrapingService{
     public static final String captionClass = "_ap3a _aaco _aacu _aacx _aad7 _aade";
     public static final String pictureClass = "x5yr21d xu96u03 x10l6tqk x13vifvy x87ps6o xh8yej3";
     public static final String LikesClass = "html-span xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x1hl2dhg x16tdsg8 x1vvkbs";
+    public static final String userCommentClass = "x1i10hfl xjqpnuy xa49m3k xqeqjp1 x2hbi6w xdl72j9 x2lah0s xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r x2lwn1j xeuugli x1hl2dhg xggy1nq x1ja2u2z x1t137rt x1q0g3np x1lku1pv x1a2a7pz x6s0dn4 xjyslct x1ejq31n xd10rxx x1sy0etr x17r0tee x9f619 x1ypdohk x1f6kntn xwhw2v2 xl56j7k x17ydfre x2b8uid xlyipyv x87ps6o x14atkfc xcdnw81 x1i0vuye xjbqb8w xm3z3ea x1x8b98j x131883w x16mih1h x972fbf xcfux6l x1qhh985 xm0m39n xt0psk2 xt7dq6l xexx8yu x4uap5 x18d9i69 xkhd6sd x1n2onr6 x1n5bzlp xqnirrm xj34u2y x568u83";
 
     private ChromeOptions options;
 
@@ -70,6 +74,7 @@ public class InstgrameScraper implements ScrapingService{
                 Result result = getResult(href, keyword);
                 results.add(result);
 
+
             }
 
 
@@ -107,7 +112,7 @@ public class InstgrameScraper implements ScrapingService{
         } catch (Exception e) {
             System.out.println("couldn't find username");
             result.setUsername("Undefined");
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         try {
@@ -139,6 +144,29 @@ public class InstgrameScraper implements ScrapingService{
         } catch (Exception e) {
             System.out.println("couldn't find likes");
             result.setLikes("Undefined");
+        }
+
+        try {
+            List<Response> responses = new ArrayList<>();
+            List<WebElement> userCommentsElement = innerDriver.findElements(By.cssSelector("a." + userCommentClass.replace(" ", ".")))
+                    .stream().filter(user -> !user.getText().equals(result.getUsername())).toList();
+            List<WebElement> CommentsElement = innerDriver.findElements(By.cssSelector("span." + captionClass.replace(" ", ".")));
+            CommentsElement.removeFirst();
+            int minSize = min(CommentsElement.size(), userCommentsElement.size());
+
+            for (int i = 0; i < minSize; i++) {
+                Response response = new Response();
+                Sentiment input = Sentiment.builder().input(CommentsElement.get(i).getText()).build();
+                Sentiment sentiment = sentimentClient.sentiment(input);
+                response.setTweet(CommentsElement.get(i).getText());
+                response.setUsername(userCommentsElement.get(i).getText());
+                response.setSentiment(sentiment.getLabel());
+                responses.add(response);
+
+            }
+            result.setResponses(responses);
+        } catch (Exception e) {
+            System.out.println("couldn't find comments");
         }
 
         innerDriver.quit();

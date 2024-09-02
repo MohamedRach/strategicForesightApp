@@ -30,3 +30,10 @@ spring:
           issuer-uri: http://localhost:8080/realms/my_realm
   config:
     import: optional:configserver:http://localhost:8888
+management:
+  zipkin:
+    tracing:
+      endpoint: "http://159.65.115.130:9411/api/v2/spans"
+  tracing:
+    sampling:
+      probability: 1.0

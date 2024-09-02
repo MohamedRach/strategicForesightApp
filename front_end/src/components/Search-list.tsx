@@ -5,13 +5,14 @@ import { cn } from "../lib/utils";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { MouseEvent, useEffect } from "react";
+import { useKeycloak } from "@react-keycloak/web";
 interface SearchListProps {
   items: Search[]
 }
 
 export function SearchList({ items }: SearchListProps) {
-  
-  const {mutate, isSuccess, isError} = useDeleteSearch()
+  const { keycloak} = useKeycloak() 
+  const {mutate, isSuccess, isError} = useDeleteSearch(keycloak.token)
 
   const handleClick = (id: string, e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
@@ -47,11 +48,17 @@ export function SearchList({ items }: SearchListProps) {
                 </div>
               <div
                   className={cn(
-                    "ml-[1000px] text-xs"
+                    "ml-[1000px] text-xs flex"
                   )}
                 >
-                  <Button onClick={(e) => handleClick(item.id, e)} variant="destructive">Delete</Button>
-                </div>
+                  <Button className="mr-20px" onClick={(e) => handleClick(item.id, e)} variant="destructive">Delete</Button>
+                  <a href={`/graph?id=${item.id}`} onClick={(e) => e.preventDefault()}>
+  <Button onClick={() => window.location.href = `/graph?id=${item.id}`}>
+    View graph
+  </Button>
+</a>
+
+                  </div>
             </div>            
               <div className="flex items-center gap-2">
                 Keywords: 

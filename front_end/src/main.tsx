@@ -10,6 +10,8 @@ import { HistoryPage } from './components/history.tsx';
 import { ReactKeycloakProvider} from '@react-keycloak/web';
 import keycloak from './hooks/keycloak.ts';
 import { AlertPage } from './components/alertPage.tsx';
+import RelationshipMap from './components/relationShipMap.tsx';
+import relationshipData from './data/relationshipData.ts';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -23,6 +25,10 @@ const router = createBrowserRouter([
     path: "/alerts",
     element: <AlertPage />,
   },
+  {
+    path: "/graph",
+    element: <RelationshipMap data={relationshipData} /> 
+  }
   
 ]);
 const queryClient = new QueryClient()

@@ -1,10 +1,7 @@
 package com.example.SearchService.Controllers;
 
 import com.example.SearchService.Domain.*;
-import com.example.SearchService.ScrapingService.FacebookScraper;
-import com.example.SearchService.ScrapingService.InstgrameScraper;
-import com.example.SearchService.ScrapingService.NewsScraper;
-import com.example.SearchService.ScrapingService.ScrapingService;
+import com.example.SearchService.ScrapingService.*;
 import com.example.SearchService.SentimentAnalysis.SentimentClient;
 import com.example.SearchService.Service.ResultService;
 import com.example.SearchService.Service.SearchService;
@@ -37,6 +34,7 @@ public class SearchController {
     private final ScrapingService facebookScraper;
     private final ScrapingService instagramScraper;
     private final ScrapingService newsScraper;
+    private final ScrapingService twitterScraper;
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, NotificationResponse> kafkaTemplate;
     private String topic;
@@ -58,6 +56,7 @@ public class SearchController {
         this.facebookScraper = new FacebookScraper(sentimentClient);
         this.instagramScraper = new InstgrameScraper(sentimentClient);
         this.newsScraper = new NewsScraper(sentimentClient);
+        this.twitterScraper = new TwitterScraper(sentimentClient);
         this.objectMapper = objectMapper;
         this.topic = topic;
         this.kafkaTemplate = kafkaTemplate;
@@ -83,6 +82,10 @@ public class SearchController {
                 case "news":
                     ArrayList<Result> newsResults = newsScraper.Scrape(keywords);
                     results.addAll(newsResults);
+                    break;
+                case "twitter":
+                    ArrayList<Result> twitterResults = twitterScraper.Scrape(keywords);
+                    results.addAll(twitterResults);
                     break;
                 default:
                     System.out.println("Unknown source: " + source);
@@ -156,11 +159,10 @@ public class SearchController {
         return "deleted success";
     }
 
-    @GetMapping("/sentiment")
+    @GetMapping("/test")
     public void getSentiment() {
-        Sentiment input = Sentiment.builder().input("i hate you").build();
-        Sentiment output = sentimentClient.sentiment(input);
-        System.out.println(output.getLabel());
+       List<String> keywords = List.of("olympics");
+       twitterScraper.Scrape(keywords);
     }
 
 }
